@@ -1,7 +1,7 @@
 type Pacman = "PACMAN_LEFT" | "PACMAN_RIGHT" | "PACMAN_UP" | "PACMAN_DOWN";
 type Assets = Pacman;
 export default class Config {
-  public static readonly CANVAS_SIZE = 800;
+  private static _CANVAS_SIZE;
   public static readonly BLOCK_SIZE = 50;
   private static assets: Map<string, HTMLImageElement> = new Map();
   private readonly fileAssets = [
@@ -15,7 +15,9 @@ export default class Config {
     "../oldpacman/PACMAN/assets/pacman_energy.webp",
     "../oldpacman/PACMAN/assets/pinkEnemy.jpg",
   ];
-  constructor() {}
+  constructor() {
+    Config._CANVAS_SIZE = document.querySelector("canvas").width;
+  }
 
   public static getAsset(name: string): HTMLImageElement {
     return this.assets.get(name);
@@ -38,5 +40,14 @@ export default class Config {
         });
       });
     });
+  }
+
+  public static getRand(range?: Partial<{ max: number; min: number }>) {
+    const { max, min } = range || {};
+    return Math.floor(Math.random() * (max || 5 - (min || 1)) + (min || 1));
+  }
+
+  public static get CANVAS_SIZE() {
+    return this._CANVAS_SIZE;
   }
 }

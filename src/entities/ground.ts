@@ -14,6 +14,7 @@ export class Ground implements Entity {
     this.ctx = ctx;
     this.state = state;
     this.groundState = this.state.groundState;
+    this.groundState.initializeDefaults();
     this.renderBlocks = {
       wall1: this.groundState.walls,
       pacman_food: this.groundState.food,

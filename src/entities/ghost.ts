@@ -1,12 +1,12 @@
 import Config from "../config";
-import { GhostState, State } from "../state";
+import { State } from "../state";
 import { Coordinate, Direction, Entity, EntityInstance } from "../types";
 
 export default class Ghost implements Entity {
   ctx: CanvasRenderingContext2D;
   state?: State;
   private lastScannedTime = -1;
-  private readonly playerSearchFrequency = 1000;
+  private readonly playerSearchFrequency = 250;
   private readonly directionMap: Record<Direction, number> = {
     down: 1,
     right: 1,
@@ -17,25 +17,12 @@ export default class Ghost implements Entity {
     this.ctx = ctx;
     this.state = state;
     this.state.ghostState.addGhost("pinkEnemy", {
-      x: 700,
-      y: 700,
+      x: 250,
+      y: 250,
     });
-    this.state.ghostState.addGhost("pinkEnemy", {
-      x: 0,
-      y: 700,
-    });
-    this.state.ghostState.addGhost("pinkEnemy", {
-      x: 300,
-      y: 700,
-    });
-    this.state.ghostState.addGhost("pinkEnemy", {
-      x: 0,
-      y: 0,
-    });
-    this.state.ghostState.addGhost("pinkEnemy", {
-      x: 220,
-      y: 130,
-    });
+    setTimeout(() => {
+      this.findPacman();
+    }, 500);
   }
   private get isTimeToSearch(): boolean {
     const now = Date.now();
@@ -63,12 +50,17 @@ export default class Ghost implements Entity {
           y: gY,
         },
       ];
-      const visitedNodes = new Set<string>(`${gX},${gY}`);
+      const visitedNodes = new Set<string>([`${gX},${gY}`]);
       while (coordinatesPath.length > 0) {
         const { x, y } = coordinatesPath[coordinatesPath.length - 1];
         const neighbors = this.getNeighboringCoordinates(x, y).filter(
-          ({ x, y }) => !visitedNodes.has(`${x},${y}`)
+          ({ x, y }) =>
+            !visitedNodes.has(`${x},${y}`) &&
+            !this.state.groundState.walls.some((wall) => {
+              return wall.x === x && wall.y === y;
+            })
         );
+        neighbors.length < 4 && console.log(neighbors);
         if (neighbors.length === 0) {
           //backtrack
           coordinatesPath.pop();
@@ -91,14 +83,16 @@ export default class Ghost implements Entity {
           [Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, null]
         );
         if (!nearestNode) break; //path doesnt exist
+        coordinatesPath.push(nearestNode);
         if (nearestNode.x === pX && nearestNode.y === pY) {
           //path found
           break;
         }
-        coordinatesPath.push(nearestNode);
         visitedNodes.add(`${nearestNode.x},${nearestNode.y}`);
       }
       ghost.setPath(coordinatesPath);
+      console.log(coordinatesPath);
+      console.log(this.state.groundState.walls);
     });
   }
   private navigateToPlayer() {
@@ -109,25 +103,26 @@ export default class Ghost implements Entity {
 
       const x = Math.floor(source.x / Config.BLOCK_SIZE) * Config.BLOCK_SIZE;
       const y = Math.floor(source.y / Config.BLOCK_SIZE) * Config.BLOCK_SIZE;
-      if (x > destination.x) {
+      if (
+        x === this.state.playerState.getCoordinates.x &&
+        y === this.state.playerState.getCoordinates.y
+      ) {
+        return this.findPacman();
+      }
+      const isXMoving = x > destination.x || x < destination.x;
+      const isYMoving = y > destination.y || y < destination.y;
+      if (isXMoving || isYMoving) {
         ghost.setPosition({
-          x: this.directionMap.left * ghost.speed + ghost.position.x,
-          y: ghost.position.y,
-        });
-      } else if (x < destination.x) {
-        ghost.setPosition({
-          x: this.directionMap.right * ghost.speed + ghost.position.x,
-          y: ghost.position.y,
-        });
-      } else if (y > destination.y) {
-        ghost.setPosition({
-          y: this.directionMap.up * ghost.speed + ghost.position.y,
-          x: ghost.position.x,
-        });
-      } else if (y < destination.y) {
-        ghost.setPosition({
-          y: this.directionMap.down * ghost.speed + ghost.position.y,
-          x: ghost.position.x,
+          x: isXMoving
+            ? this.directionMap[x < destination.x ? "right" : "left"] *
+                ghost.speed +
+              ghost.position.x
+            : ghost.position.x,
+          y: isYMoving
+            ? this.directionMap[y < destination.y ? "down" : "up"] *
+                ghost.speed +
+              ghost.position.y
+            : ghost.position.y,
         });
       } else {
         ghost.pathIndex += 1;
@@ -141,17 +136,15 @@ export default class Ghost implements Entity {
       { x: gX, y: gY - Config.BLOCK_SIZE }, // Top
       { x: gX, y: gY + Config.BLOCK_SIZE }, // Bottom
     ];
-    return c.filter(({ x, y }) => {
+    c = c.filter(({ x, y }) => {
       return !(
         x > Config.CANVAS_SIZE ||
         y > Config.CANVAS_SIZE ||
         x < 0 ||
-        y < 0 ||
-        this.state.groundState.walls.find((wall) => {
-          return wall.x === x && wall.y === y;
-        })
+        y < 0
       );
     });
+    return c;
   }
   destroy(): void {}
   draw(): void {
@@ -164,7 +157,6 @@ export default class Ghost implements Entity {
         Config.BLOCK_SIZE
       );
     });
-    this.findPacman();
     this.navigateToPlayer();
   }
 }

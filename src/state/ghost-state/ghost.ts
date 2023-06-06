@@ -5,7 +5,7 @@ export default class Ghost {
   private _path: Coordinate[] = [];
   private _position: Coordinate;
   public pathIndex: number = 0;
-  public speed = Math.floor(Math.random() * 10 + 1);
+  public speed = Math.floor(Math.random() * (5 - 2) + 2);
 
   constructor(name: string) {
     this._name = name;

@@ -18,4 +18,6 @@ export default class GhostState {
   public get ghosts(): Ghost[] {
     return this._ghosts;
   }
+
+  public initializeDefaultGhosts() {}
 }
