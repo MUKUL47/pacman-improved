@@ -1,9 +1,10 @@
 import Config from "./config";
 import { Ground, Player, Ghost } from "./entities";
 import { State } from "./state";
+import { Entity } from "./types";
 class Game extends Config {
   private ctx: CanvasRenderingContext2D;
-  private entities: any[] = [];
+  private entities: Entity[] = [];
   private renderId: number;
   private state: State;
   constructor() {
@@ -23,12 +24,15 @@ class Game extends Config {
   private render() {
     this.ctx.clearRect(0, 0, Config.CANVAS_SIZE, Config.CANVAS_SIZE);
     for (const e of this.entities) {
-      e?.draw();
+      e.draw?.();
     }
     this.renderId = window.requestAnimationFrame(() => this.render());
   }
   public destroy() {
     window.cancelAnimationFrame(this.renderId);
+    for (const e of this.entities) {
+      e.destroy?.();
+    }
   }
 }
 new Game();

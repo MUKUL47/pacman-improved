@@ -1,23 +1,37 @@
 import Ghost from "./ghost";
 import { Coordinate } from "../../types";
+import Config from "../../config";
 
 export default class GhostState {
   private _ghosts: Ghost[] = [];
   public static readonly speed = 7;
   constructor() {}
 
-  public addGhost(name: string, position: Coordinate): Ghost {
-    // const hasGhost = this._ghosts.find((ghost) => ghost.name);
-    // if (!!hasGhost) return hasGhost;
-    const ghost = new Ghost(name);
-    ghost.setPosition(position);
-    this._ghosts.push(ghost);
-    return ghost;
-  }
-
   public get ghosts(): Ghost[] {
     return this._ghosts;
   }
 
-  public initializeDefaultGhosts() {}
+  public initializeDefaults(): void {
+    this._ghosts = [
+      new Ghost("pinkEnemy").setPosition({ x: 0, y: 0 }).setDifficulty(1.5),
+      new Ghost("pinkEnemy")
+        .setPosition({
+          x: Config.CANVAS_SIZE - Config.BLOCK_SIZE,
+          y: 0,
+        })
+        .setDifficulty(1.75),
+      new Ghost("pinkEnemy")
+        .setPosition({
+          x: 0,
+          y: Config.CANVAS_SIZE - Config.BLOCK_SIZE,
+        })
+        .setDifficulty(2),
+      new Ghost("pinkEnemy")
+        .setPosition({
+          x: Config.CANVAS_SIZE - Config.BLOCK_SIZE,
+          y: Config.CANVAS_SIZE - Config.BLOCK_SIZE,
+        })
+        .setDifficulty(2.5),
+    ];
+  }
 }

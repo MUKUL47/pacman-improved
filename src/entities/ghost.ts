@@ -6,7 +6,7 @@ export default class Ghost implements Entity {
   ctx: CanvasRenderingContext2D;
   state?: State;
   private lastScannedTime = -1;
-  private readonly playerSearchFrequency = 250;
+  private readonly playerSearchFrequency = 500;
   private readonly directionMap: Record<Direction, number> = {
     down: 1,
     right: 1,
@@ -16,13 +16,7 @@ export default class Ghost implements Entity {
   constructor({ ctx, state }: EntityInstance) {
     this.ctx = ctx;
     this.state = state;
-    this.state.ghostState.addGhost("pinkEnemy", {
-      x: 250,
-      y: 250,
-    });
-    setTimeout(() => {
-      this.findPacman();
-    }, 500);
+    this.state.ghostState.initializeDefaults();
   }
   private get isTimeToSearch(): boolean {
     const now = Date.now();
@@ -35,6 +29,12 @@ export default class Ghost implements Entity {
   findPacman() {
     if (!this.isTimeToSearch) return;
     this.state.ghostState.ghosts.forEach((ghost) => {
+      if (
+        this.isTimeToSearch &&
+        (ghost.position.x % Config.BLOCK_SIZE != 0 ||
+          ghost.position.y % Config.BLOCK_SIZE != 0)
+      )
+        return;
       const player = this.state.playerState.getCoordinates;
       const [pX, pY] = [
         Math.floor(player.x / Config.BLOCK_SIZE) * Config.BLOCK_SIZE,
@@ -60,7 +60,6 @@ export default class Ghost implements Entity {
               return wall.x === x && wall.y === y;
             })
         );
-        neighbors.length < 4 && console.log(neighbors);
         if (neighbors.length === 0) {
           //backtrack
           coordinatesPath.pop();
@@ -73,7 +72,14 @@ export default class Ghost implements Entity {
             const dX = Math.abs(c.x - pX);
             const dY = Math.abs(c.y - pY);
             const isNearest = dX <= x1 && dY <= y1;
-            const node = isNearest ? { x: c.x, y: c.y } : oldNode;
+            const isShortest =
+              Config.getRand({
+                min: 1,
+                max: ghost.difficulty,
+              }) === ghost.difficulty;
+            const node = isNearest
+              ? (!isShortest && { x: c.x, y: c.y }) || oldNode
+              : (!!isShortest && { x: c.x, y: c.y }) || oldNode;
             return [
               isNearest ? dX : x1,
               isNearest ? dY : y1,
@@ -91,8 +97,6 @@ export default class Ghost implements Entity {
         visitedNodes.add(`${nearestNode.x},${nearestNode.y}`);
       }
       ghost.setPath(coordinatesPath);
-      console.log(coordinatesPath);
-      console.log(this.state.groundState.walls);
     });
   }
   private navigateToPlayer() {
@@ -103,26 +107,34 @@ export default class Ghost implements Entity {
 
       const x = Math.floor(source.x / Config.BLOCK_SIZE) * Config.BLOCK_SIZE;
       const y = Math.floor(source.y / Config.BLOCK_SIZE) * Config.BLOCK_SIZE;
-      if (
-        x === this.state.playerState.getCoordinates.x &&
-        y === this.state.playerState.getCoordinates.y
-      ) {
-        return this.findPacman();
-      }
-      const isXMoving = x > destination.x || x < destination.x;
-      const isYMoving = y > destination.y || y < destination.y;
-      if (isXMoving || isYMoving) {
+      const right = source.x < destination.x;
+      const left = source.x > destination.x;
+      const down = source.y < destination.y;
+      const up = source.y > destination.y;
+      const isXMoving = right || left;
+      const isYMoving = up || down;
+      if (isXMoving) {
+        const dx =
+          this.directionMap[x < destination.x ? "right" : "left"] *
+            ghost.speed +
+          ghost.position.x;
+        const finalX =
+          Math.abs(dx - destination.x) < ghost.speed &&
+          Math.abs(dx - destination.x) > 0;
         ghost.setPosition({
-          x: isXMoving
-            ? this.directionMap[x < destination.x ? "right" : "left"] *
-                ghost.speed +
-              ghost.position.x
-            : ghost.position.x,
-          y: isYMoving
-            ? this.directionMap[y < destination.y ? "down" : "up"] *
-                ghost.speed +
-              ghost.position.y
-            : ghost.position.y,
+          x: finalX ? destination.x : dx,
+          y: ghost.position.y,
+        });
+      } else if (isYMoving) {
+        const dy =
+          this.directionMap[y < destination.y ? "down" : "up"] * ghost.speed +
+          ghost.position.y;
+        const finalY =
+          Math.abs(dy - destination.y) < ghost.speed &&
+          Math.abs(dy - destination.y) > 0;
+        ghost.setPosition({
+          x: ghost.position.x,
+          y: finalY ? destination.y : dy,
         });
       } else {
         ghost.pathIndex += 1;
@@ -137,11 +149,11 @@ export default class Ghost implements Entity {
       { x: gX, y: gY + Config.BLOCK_SIZE }, // Bottom
     ];
     c = c.filter(({ x, y }) => {
-      return !(
-        x > Config.CANVAS_SIZE ||
-        y > Config.CANVAS_SIZE ||
-        x < 0 ||
-        y < 0
+      return (
+        x <= Config.CANVAS_SIZE - Config.BLOCK_SIZE &&
+        y <= Config.CANVAS_SIZE - Config.BLOCK_SIZE &&
+        x >= 0 &&
+        y >= 0
       );
     });
     return c;
@@ -157,6 +169,7 @@ export default class Ghost implements Entity {
         Config.BLOCK_SIZE
       );
     });
+    this.findPacman();
     this.navigateToPlayer();
   }
 }

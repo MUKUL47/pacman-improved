@@ -28,7 +28,8 @@ export default class Player implements Entity {
     try {
       const coord =
         this.direction === "down" || this.direction === "up" ? "y" : "x";
-      this.checkBoundary(coord);
+      // this.checkBoundary(coord);
+      this.teleportIfOutOfBounds(coord);
       this.checkWalls();
       this.checkFood();
       this.playerState.setCoordinates({
@@ -38,18 +39,6 @@ export default class Player implements Entity {
       });
     } catch (e) {}
   };
-
-  private checkBoundary(coord: string) {
-    if (
-      ((this.direction === "down" || this.direction === "right") &&
-        this.playerState.getCoordinates[coord] >=
-          Config.CANVAS_SIZE - Config.BLOCK_SIZE) ||
-      ((this.direction === "left" || this.direction === "up") &&
-        this.playerState.getCoordinates[coord] <= 0)
-    )
-      throw "";
-  }
-
   private checkFood() {
     const { x, y } = this.playerState.getCoordinates;
     for (let i = 0; i < this.state.groundState.food.length; i++) {
@@ -61,6 +50,25 @@ export default class Player implements Entity {
       ) {
         this.state.groundState.eatFood(i);
       }
+    }
+  }
+
+  private teleportIfOutOfBounds(coord: string) {
+    if (
+      (this.direction === "down" || this.direction === "right") &&
+      this.playerState.getCoordinates[coord] >= Config.CANVAS_SIZE
+    ) {
+      this.playerState.setCoordinates({
+        [coord]: 0 - Math.floor(Config.BLOCK_SIZE),
+      });
+    }
+    if (
+      (this.direction === "left" || this.direction === "up") &&
+      this.playerState.getCoordinates[coord] <= -Config.BLOCK_SIZE
+    ) {
+      this.playerState.setCoordinates({
+        [coord]: Config.CANVAS_SIZE + Config.BLOCK_SIZE,
+      });
     }
   }
 

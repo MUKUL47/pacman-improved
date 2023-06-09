@@ -6,18 +6,27 @@ export class GroundState {
 
   public initializeDefaults() {
     const bounds = Math.floor(Config.CANVAS_SIZE / Config.BLOCK_SIZE);
+    this._walls.push({
+      x: 100,
+      y: 250,
+    });
+    this._walls.push({
+      x: 150,
+      y: 250,
+    });
     for (let i = 0; i < bounds; i++) {
       for (let j = 0; j < bounds; j++) {
-        if (Config.getRand({ max: 7 }) === 7) {
+        if (i === i && i === 0) continue;
+        if (Config.getRand({ max: 8 }) === 8) {
           this._walls.push({
             x: i * Config.BLOCK_SIZE,
             y: j * Config.BLOCK_SIZE,
           });
         } else if (Config.getRand({ max: 50 }) === 50) {
-          this._food.push({
-            x: i * Config.BLOCK_SIZE,
-            y: j * Config.BLOCK_SIZE,
-          });
+          // this._food.push({
+          //   x: i * Config.BLOCK_SIZE,
+          //   y: j * Config.BLOCK_SIZE,
+          // });
         }
       }
     }
