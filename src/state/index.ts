@@ -10,6 +10,14 @@ export class State {
     this._playerState = new PlayerState();
     this._groundState = new GroundState();
     this._ghostState = new GhostState();
+    return new Proxy(this, {
+      set: (target, prop, value) => {
+        throw new Error("Updating values in State is forbidden.");
+      },
+      deleteProperty: (target, prop) => {
+        throw new Error("Deleting properties in State is forbidden.");
+      },
+    });
   }
   public get playerState(): PlayerState {
     return this._playerState;

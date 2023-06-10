@@ -28,10 +28,10 @@ export default class Player implements Entity {
     try {
       const coord =
         this.direction === "down" || this.direction === "up" ? "y" : "x";
-      // this.checkBoundary(coord);
       this.teleportIfOutOfBounds(coord);
       this.checkWalls();
       this.checkFood();
+      this.findPanicGhosts();
       this.playerState.setCoordinates({
         [coord]:
           this.directionMap[this.direction] +
@@ -49,8 +49,23 @@ export default class Player implements Entity {
         Math.abs(y - food.y) <= Math.floor(Config.BLOCK_SIZE / 2)
       ) {
         this.state.groundState.eatFood(i);
+        this.state.ghostState.triggerPanic();
       }
     }
+  }
+
+  private findPanicGhosts() {
+    this.state.ghostState.ghosts.forEach((ghost) => {
+      if (
+        Math.abs(ghost.position.x - this.playerState.getCoordinates.x) <
+          Config.BLOCK_SIZE / 2 &&
+        Math.abs(ghost.position.y - this.playerState.getCoordinates.y) <
+          Config.BLOCK_SIZE / 2 &&
+        !!ghost.panicMode?.flag
+      ) {
+        ghost.respawning = true;
+      }
+    });
   }
 
   private teleportIfOutOfBounds(coord: string) {

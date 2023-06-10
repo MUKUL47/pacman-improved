@@ -3,30 +3,24 @@ import { Coordinate } from "../types";
 export class GroundState {
   private _walls: Array<Coordinate & { removed?: boolean }> = [];
   private _food: Array<Coordinate & { removed?: boolean }> = [];
+  public wallsMap: Set<string> = new Set();
+  public foodMap: Set<string> = new Set();
 
   public initializeDefaults() {
     const bounds = Math.floor(Config.CANVAS_SIZE / Config.BLOCK_SIZE);
-    this._walls.push({
-      x: 100,
-      y: 250,
-    });
-    this._walls.push({
-      x: 150,
-      y: 250,
-    });
     for (let i = 0; i < bounds; i++) {
       for (let j = 0; j < bounds; j++) {
         if (i === i && i === 0) continue;
+        const { x, y } = {
+          x: i * Config.BLOCK_SIZE,
+          y: j * Config.BLOCK_SIZE,
+        };
         if (Config.getRand({ max: 8 }) === 8) {
-          this._walls.push({
-            x: i * Config.BLOCK_SIZE,
-            y: j * Config.BLOCK_SIZE,
-          });
+          this._walls.push({ x, y });
+          this.wallsMap.add(`${x},${y}`);
         } else if (Config.getRand({ max: 50 }) === 50) {
-          // this._food.push({
-          //   x: i * Config.BLOCK_SIZE,
-          //   y: j * Config.BLOCK_SIZE,
-          // });
+          this._food.push({ x, y });
+          this.foodMap.add(`${x},${y}`);
         }
       }
     }

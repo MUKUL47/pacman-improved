@@ -13,7 +13,12 @@ export default class Config {
     "../oldpacman/PACMAN/assets/walkable.png",
     "../oldpacman/PACMAN/assets/pacman_food.png",
     "../oldpacman/PACMAN/assets/pacman_energy.webp",
+    "../oldpacman/PACMAN/assets/redEnemyy.jpg",
+    "../oldpacman/PACMAN/assets/blueEnemy.jpg",
+    "../oldpacman/PACMAN/assets/yellowEnemy.jpg",
     "../oldpacman/PACMAN/assets/pinkEnemy.jpg",
+    "../oldpacman/PACMAN/assets/ghostDead.jpg",
+    "../oldpacman/PACMAN/assets/dead_pacman.png",
   ];
   constructor() {
     Config._CANVAS_SIZE = document.querySelector("canvas").width;
@@ -49,5 +54,9 @@ export default class Config {
 
   public static get CANVAS_SIZE() {
     return this._CANVAS_SIZE;
+  }
+
+  public static getStartPos(c: number): number {
+    return Math.floor(c / this.BLOCK_SIZE) * this.BLOCK_SIZE;
   }
 }
