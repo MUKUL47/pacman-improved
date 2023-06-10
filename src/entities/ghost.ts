@@ -27,12 +27,11 @@ export default class Ghost implements Entity {
     return false;
   }
   findPacman() {
+    if (!this.isTimeToSearch) return;
     this.state.ghostState.ghosts.forEach((ghost) => {
       if (
-        !this.isTimeToSearch ||
         ghost.position.x % Config.BLOCK_SIZE != 0 ||
-        ghost.position.y % Config.BLOCK_SIZE != 0 ||
-        !!ghost.path[ghost.pathIndex]
+        ghost.position.y % Config.BLOCK_SIZE != 0
       )
         return;
       if (ghost.respawning) {

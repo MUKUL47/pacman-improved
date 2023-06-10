@@ -36,12 +36,30 @@ export default class GhostState {
       new Ghost("blueEnemy")
         .setPosition(
           {
-            x: 500 - Config.BLOCK_SIZE,
+            x: Config.CANVAS_SIZE - Config.BLOCK_SIZE,
             y: 0,
           },
           true
         )
         .setDifficulty(1.75),
+      new Ghost("yellowEnemy")
+        .setPosition(
+          {
+            x: 0,
+            y: Config.CANVAS_SIZE - Config.BLOCK_SIZE,
+          },
+          true
+        )
+        .setDifficulty(2),
+      new Ghost("pinkEnemy")
+        .setPosition(
+          {
+            x: Config.CANVAS_SIZE - Config.BLOCK_SIZE,
+            y: Config.CANVAS_SIZE - Config.BLOCK_SIZE,
+          },
+          true
+        )
+        .setDifficulty(2.5),
     ];
   }
 }

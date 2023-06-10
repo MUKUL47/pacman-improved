@@ -30,7 +30,7 @@ export default class Player implements Entity {
         this.direction === "down" || this.direction === "up" ? "y" : "x";
       this.teleportIfOutOfBounds(coord);
       this.checkWalls();
-      this.checkFood();
+      this.checkFoodAndScore();
       this.findPanicGhosts();
       this.playerState.setCoordinates({
         [coord]:
@@ -39,7 +39,7 @@ export default class Player implements Entity {
       });
     } catch (e) {}
   };
-  private checkFood() {
+  private checkFoodAndScore() {
     const { x, y } = this.playerState.getCoordinates;
     for (let i = 0; i < this.state.groundState.food.length; i++) {
       const food = this.state.groundState.food[i];
@@ -50,6 +50,16 @@ export default class Player implements Entity {
       ) {
         this.state.groundState.eatFood(i);
         this.state.ghostState.triggerPanic();
+      }
+    }
+    for (let i = 0; i < this.state.groundState.score.length; i++) {
+      const score = this.state.groundState.score[i];
+      if (!!score.removed) continue;
+      if (
+        Math.abs(x - score.x) <= Math.floor(Config.BLOCK_SIZE / 2) &&
+        Math.abs(y - score.y) <= Math.floor(Config.BLOCK_SIZE / 2)
+      ) {
+        this.state.groundState.addScore(i);
       }
     }
   }
@@ -64,6 +74,7 @@ export default class Player implements Entity {
         !!ghost.panicMode?.flag
       ) {
         ghost.respawning = true;
+        ghost.speed = 10;
       }
     });
   }

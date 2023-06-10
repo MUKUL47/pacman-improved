@@ -18,6 +18,7 @@ export class Ground implements Entity {
     this.renderBlocks = {
       wall1: this.groundState.walls,
       pacman_food: this.groundState.food,
+      pacman_energy: this.groundState.score,
     };
   }
   destroy(): void {}

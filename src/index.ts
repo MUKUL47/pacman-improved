@@ -1,7 +1,9 @@
 import Config from "./config";
 import { Ground, Player, Ghost } from "./entities";
+import MapCreation from "./map-creation";
 import { State } from "./state";
 import { Entity } from "./types";
+import "./style.css";
 class Game extends Config {
   private ctx: CanvasRenderingContext2D;
   private entities: Entity[] = [];
@@ -11,9 +13,9 @@ class Game extends Config {
     super();
     this.ctx = document.querySelector("canvas").getContext("2d");
     this.state = new State();
-    this.preloadAssets().then(this._init);
   }
-  private _init = () => {
+  public start = async () => {
+    await this.preloadAssets();
     this.entities = [
       new Ground({ ctx: this.ctx, state: this.state }),
       new Player({ ctx: this.ctx, state: this.state }),
@@ -35,4 +37,4 @@ class Game extends Config {
     }
   }
 }
-new Game();
+new Game().start();

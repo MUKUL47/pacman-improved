@@ -19,6 +19,7 @@ export default class Config {
     "../oldpacman/PACMAN/assets/pinkEnemy.jpg",
     "../oldpacman/PACMAN/assets/ghostDead.jpg",
     "../oldpacman/PACMAN/assets/dead_pacman.png",
+    "../oldpacman/PACMAN/assets/walkable.png",
   ];
   constructor() {
     Config._CANVAS_SIZE = document.querySelector("canvas").width;
