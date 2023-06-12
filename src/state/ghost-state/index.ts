@@ -1,6 +1,5 @@
-import Ghost from "./ghost";
-import { Coordinate } from "../../types";
 import Config from "../../config";
+import Ghost from "./ghost";
 
 export default class GhostState {
   private _ghosts: Ghost[] = [];
@@ -12,54 +11,35 @@ export default class GhostState {
   }
 
   public triggerPanic() {
-    this._ghosts.forEach((ghost) => {
-      ghost.setPanic(true);
-    });
+    this._ghosts.forEach((ghost) => ghost.setPanic(true));
   }
 
-  public respawn(ghost: Ghost) {
-    const idx = this._ghosts.findIndex((g) => g.id === ghost.id);
-    if (idx === -1) return;
+  public respawn(idx: number) {
+    const ghost = this._ghosts[idx];
+    if (!ghost) return;
     this._ghosts.splice(idx, 1);
     this._ghosts.push(
-      new Ghost(ghost.name)
-        .setDifficulty(ghost.difficulty)
-        .setPosition(ghost.position, true)
+      new Ghost(ghost.name, ghost.origin, ghost.difficulty).setDifficulty(
+        ghost.difficulty
+      )
     );
   }
 
   public initializeDefaults(): void {
     this._ghosts = [
-      new Ghost("redEnemyy")
-        .setPosition({ x: 300, y: 0 }, true)
-        .setDifficulty(1.5),
-      new Ghost("blueEnemy")
-        .setPosition(
-          {
-            x: Config.CANVAS_SIZE - Config.BLOCK_SIZE,
-            y: 0,
-          },
-          true
-        )
-        .setDifficulty(1.75),
-      new Ghost("yellowEnemy")
-        .setPosition(
-          {
-            x: 0,
-            y: Config.CANVAS_SIZE - Config.BLOCK_SIZE,
-          },
-          true
-        )
-        .setDifficulty(2),
-      new Ghost("pinkEnemy")
-        .setPosition(
-          {
-            x: Config.CANVAS_SIZE - Config.BLOCK_SIZE,
-            y: Config.CANVAS_SIZE - Config.BLOCK_SIZE,
-          },
-          true
-        )
-        .setDifficulty(2.5),
+      new Ghost("redEnemyy", { x: 300, y: 0 }).setDifficulty(1),
+      new Ghost("blueEnemy", {
+        x: Config.CANVAS_SIZE.width - Config.BLOCK_SIZE,
+        y: 0,
+      }).setDifficulty(2),
+      new Ghost("yellowEnemy", {
+        x: 0,
+        y: Config.CANVAS_SIZE.height - Config.BLOCK_SIZE,
+      }).setDifficulty(3),
+      new Ghost("pinkEnemy", {
+        x: Config.CANVAS_SIZE.width - Config.BLOCK_SIZE,
+        y: Config.CANVAS_SIZE.height - Config.BLOCK_SIZE,
+      }).setDifficulty(4),
     ];
   }
 }

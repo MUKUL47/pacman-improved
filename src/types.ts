@@ -6,7 +6,6 @@ export interface Entity {
   draw(): void;
   destroy(): void;
 }
-type S = typeof State;
 export type EntityInstance = { ctx: CanvasRenderingContext2D; state: State };
 export type Coordinate = { x: number; y: number };
 export type Direction = "left" | "right" | "down" | "up";

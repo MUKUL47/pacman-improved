@@ -7,22 +7,25 @@ export default class Ghost {
   public path: Coordinate[] = [];
   public position: Coordinate;
   public pathIndex: number = 0;
-  public speed = Config.getRand({ max: 5, min: 2 });
+  public speed = Config.getRand({ max: 4, min: 2 });
   public difficulty: number = 5;
   public origin: Coordinate;
   public respawning: boolean | 1 = false;
   public panicModeFrequency = 5000;
   public panicMode: { flag: boolean; lastPanicedAt?: number };
+  private lastScannedTime = -1;
+  private searchFrequency: number = 800;
 
-  constructor(name: string) {
+  constructor(name: string, coordinate: Coordinate, difficulty?: number) {
     this.name = name;
+    this.position = coordinate;
+    this.origin = coordinate;
+    this.difficulty =
+      difficulty ?? Math.floor(Config.getRand({ max: 5, min: 1 }));
   }
 
-  public setPosition(coordinate: Coordinate, start?: boolean): this {
+  public setPosition(coordinate: Coordinate): this {
     this.position = coordinate;
-    if (start) {
-      this.origin = coordinate;
-    }
     return this;
   }
   public setPath(coordinates: Coordinate[]): this {
@@ -50,5 +53,23 @@ export default class Ghost {
   public setPanic(flag: boolean): this {
     this.panicMode = { flag, lastPanicedAt: Date.now() };
     return this;
+  }
+  public get isTimeToSearch(): boolean {
+    const now = Date.now();
+    if (now - this.lastScannedTime >= this.searchFrequency) {
+      this.lastScannedTime = now;
+      return true;
+    }
+    return false;
+  }
+
+  public get identity() {
+    return Config.getAsset(
+      this.respawning
+        ? "dead_pacman"
+        : !this.panicMode?.flag
+        ? this.name
+        : "ghostDead"
+    );
   }
 }

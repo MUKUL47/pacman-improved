@@ -12,6 +12,7 @@ export default class Player implements Entity {
     up: -PlayerState.getSpeed,
     left: -PlayerState.getSpeed,
   };
+  private nextDirection: Direction = this.direction;
   constructor({ ctx, state }: EntityInstance) {
     this.ctx = ctx;
     this.state = state;
@@ -21,15 +22,37 @@ export default class Player implements Entity {
   onKeyUp = ({ key }) => {
     if (!["ArrowUp", "ArrowLeft", "ArrowRight", "ArrowDown"].includes(key))
       return;
-    this.direction = key.split("Arrow")[1].toLowerCase();
+    const direction: Direction = key.split("Arrow")[1].toLowerCase();
+    if (this.checkWalls(direction)) {
+      this.direction = direction;
+      this.nextDirection = direction;
+    } else if (
+      (direction === "down" &&
+        (this.direction === "right" || this.direction === "left")) ||
+      (direction === "up" &&
+        (this.direction === "right" || this.direction === "left")) ||
+      (direction === "left" &&
+        (this.direction === "up" || this.direction === "down")) ||
+      (direction === "right" &&
+        (this.direction === "up" || this.direction === "down"))
+    ) {
+      this.nextDirection = direction;
+    }
   };
 
   move = () => {
     try {
-      const coord =
+      let coord =
         this.direction === "down" || this.direction === "up" ? "y" : "x";
       this.teleportIfOutOfBounds(coord);
-      this.checkWalls();
+      if (
+        this.direction !== this.nextDirection &&
+        this.checkWalls(this.nextDirection)
+      ) {
+        this.direction = this.nextDirection;
+        coord =
+          this.direction === "down" || this.direction === "up" ? "y" : "x";
+      } else if (!this.checkWalls()) return;
       this.checkFoodAndScore();
       this.findPanicGhosts();
       this.playerState.setCoordinates({
@@ -82,7 +105,7 @@ export default class Player implements Entity {
   private teleportIfOutOfBounds(coord: string) {
     if (
       (this.direction === "down" || this.direction === "right") &&
-      this.playerState.getCoordinates[coord] >= Config.CANVAS_SIZE
+      this.playerState.getCoordinates[coord] >= Config.CANVAS_SIZE.width
     ) {
       this.playerState.setCoordinates({
         [coord]: 0 - Math.floor(Config.BLOCK_SIZE),
@@ -93,38 +116,40 @@ export default class Player implements Entity {
       this.playerState.getCoordinates[coord] <= -Config.BLOCK_SIZE
     ) {
       this.playerState.setCoordinates({
-        [coord]: Config.CANVAS_SIZE + Config.BLOCK_SIZE,
+        [coord]: Config.CANVAS_SIZE.height + Config.BLOCK_SIZE,
       });
     }
   }
 
-  private checkWalls() {
+  private checkWalls(preMove?: Direction) {
     const { x, y } = this.playerState.getCoordinates;
+    const direction = preMove || this.direction;
     for (let i = 0; i < this.state.groundState.walls.length; i++) {
       const wall = this.state.groundState.walls[i];
       const matchX = Math.abs(x - wall.x) < Config.BLOCK_SIZE;
       const matchY = Math.abs(y - wall.y) < Config.BLOCK_SIZE;
       if (
-        (this.direction === "right" &&
+        (direction === "right" &&
           Math.abs(wall.x - (x + Config.BLOCK_SIZE)) <=
             PlayerState.collisionGap &&
           matchY) ||
-        (this.direction === "left" &&
+        (direction === "left" &&
           Math.abs(x - (wall.x + Config.BLOCK_SIZE)) <=
             PlayerState.collisionGap &&
           matchY) ||
-        (this.direction === "down" &&
+        (direction === "down" &&
           Math.abs(y + Config.BLOCK_SIZE - wall.y) <=
             PlayerState.collisionGap &&
           matchX) ||
-        (this.direction === "up" &&
+        (direction === "up" &&
           Math.abs(y - (wall.y + Config.BLOCK_SIZE)) <=
             PlayerState.collisionGap &&
           matchX)
       ) {
-        throw "";
+        return false;
       }
     }
+    return true;
   }
 
   destroy(): void {

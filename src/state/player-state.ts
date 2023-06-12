@@ -1,9 +1,13 @@
+import Config from "../config";
 import { Coordinate } from "../types";
 
 export class PlayerState {
   private static speed = 5;
   public static readonly collisionGap = 3;
-  private coordinates: Coordinate = { x: 0, y: 0 };
+  private coordinates: Coordinate = {
+    y: Config.CANVAS_SIZE.height - Config.BLOCK_SIZE,
+    x: 0,
+  };
   public get getCoordinates() {
     return this.coordinates;
   }

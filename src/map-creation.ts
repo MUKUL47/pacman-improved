@@ -35,6 +35,7 @@ export default class MapCreation extends Config {
     this.ctx.addEventListener("mousemove", (e) =>
       this.onCanvasMove(e.clientX, e.clientY)
     );
+    this.render();
   };
 
   private onDocumentClick = (e) => {
@@ -99,17 +100,28 @@ export default class MapCreation extends Config {
 
   private render() {
     const context = this.ctx.getContext("2d");
-    context.clearRect(0, 0, Config.CANVAS_SIZE, Config.CANVAS_SIZE);
-    this.renderBlocks.forEach((v, k) => {
-      const [x, y] = k.split(",").map(Number);
-      context.drawImage(
-        Config.getAsset(this.assetMap[v]),
-        x,
-        y,
-        Config.BLOCK_SIZE,
-        Config.BLOCK_SIZE
-      );
-    });
+    context.clearRect(
+      0,
+      0,
+      Config.CANVAS_SIZE.width,
+      Config.CANVAS_SIZE.height
+    );
+    const x = Math.floor(Config.CANVAS_SIZE.width / Config.BLOCK_SIZE);
+    const y = Math.floor(Config.CANVAS_SIZE.height / Config.BLOCK_SIZE);
+    for (let i = 0; i < x; i++) {
+      for (let j = 0; j < y; j++) {
+        const dx = i * Config.BLOCK_SIZE;
+        const dy = j * Config.BLOCK_SIZE;
+        const asset = this.renderBlocks.get(`${dx},${dy}`);
+        context.drawImage(
+          Config.getAsset(!!asset ? this.assetMap[asset] : "walkable"),
+          dx,
+          dy,
+          Config.BLOCK_SIZE,
+          Config.BLOCK_SIZE
+        );
+      }
+    }
   }
 
   destroy() {

@@ -5,8 +5,6 @@ import { Coordinate, Direction, Entity, EntityInstance } from "../types";
 export default class Ghost implements Entity {
   ctx: CanvasRenderingContext2D;
   state?: State;
-  private lastScannedTime = -1;
-  private readonly playerSearchFrequency = 800;
   private readonly directionMap: Record<Direction, number> = {
     down: 1,
     right: 1,
@@ -18,20 +16,12 @@ export default class Ghost implements Entity {
     this.state = state;
     this.state.ghostState.initializeDefaults();
   }
-  private get isTimeToSearch(): boolean {
-    const now = Date.now();
-    if (now - this.lastScannedTime >= this.playerSearchFrequency) {
-      this.lastScannedTime = now;
-      return true;
-    }
-    return false;
-  }
   findPacman() {
-    if (!this.isTimeToSearch) return;
     this.state.ghostState.ghosts.forEach((ghost) => {
       if (
         ghost.position.x % Config.BLOCK_SIZE != 0 ||
-        ghost.position.y % Config.BLOCK_SIZE != 0
+        ghost.position.y % Config.BLOCK_SIZE != 0 ||
+        !ghost.isTimeToSearch
       )
         return;
       if (ghost.respawning) {
@@ -39,14 +29,16 @@ export default class Ghost implements Entity {
         ghost.respawning = 1;
       }
 
-      const player = ghost.respawning
+      const isLucky =
+        Config.getRand({ min: 1, max: ghost.difficulty }) === ghost.difficulty;
+      const destination = ghost.respawning
         ? ghost.origin
-        : ghost.panicMode?.flag
+        : ghost.panicMode?.flag || !isLucky
         ? this.getRandSaveSpot()
         : this.state.playerState.getCoordinates;
       const [pX, pY] = [
-        Math.floor(player.x / Config.BLOCK_SIZE) * Config.BLOCK_SIZE,
-        Math.floor(player.y / Config.BLOCK_SIZE) * Config.BLOCK_SIZE,
+        Math.floor(destination.x / Config.BLOCK_SIZE) * Config.BLOCK_SIZE,
+        Math.floor(destination.y / Config.BLOCK_SIZE) * Config.BLOCK_SIZE,
       ];
       const [gX, gY] = [
         Math.floor(ghost.position.x / Config.BLOCK_SIZE) * Config.BLOCK_SIZE,
@@ -61,13 +53,7 @@ export default class Ghost implements Entity {
       const visitedNodes = new Set<string>([`${gX},${gY}`]);
       while (coordinatesPath.length > 0) {
         const { x, y } = coordinatesPath[coordinatesPath.length - 1];
-        const neighbors = this.getNeighboringCoordinates(x, y).filter(
-          ({ x, y }) =>
-            !visitedNodes.has(`${x},${y}`) &&
-            !this.state.groundState.walls.some((wall) => {
-              return wall.x === x && wall.y === y;
-            })
-        );
+        const neighbors = this.getNeighboringCoordinates(x, y, visitedNodes);
         if (neighbors.length === 0) {
           //backtrack
           coordinatesPath.pop();
@@ -105,24 +91,23 @@ export default class Ghost implements Entity {
       const x = Config.getStartPos(
         Config.getRand({
           min: 0,
-          max: Config.CANVAS_SIZE - Config.BLOCK_SIZE,
+          max: Config.CANVAS_SIZE.width - Config.BLOCK_SIZE,
         })
       );
       const y = Config.getStartPos(
         Config.getRand({
           min: 0,
-          max: Config.CANVAS_SIZE - Config.BLOCK_SIZE,
+          max: Config.CANVAS_SIZE.height - Config.BLOCK_SIZE,
         })
       );
       if (!this.state.groundState.wallsMap.has(`${x},${y}`)) return { x, y };
     }
   }
   private navigateToPlayer() {
-    this.state.ghostState.ghosts.forEach((ghost) => {
+    this.state.ghostState.ghosts.forEach((ghost, idx) => {
       const source = ghost.position;
       const destination = ghost.path[ghost.pathIndex];
       if (!destination) return;
-
       const x = Math.floor(source.x / Config.BLOCK_SIZE) * Config.BLOCK_SIZE;
       const y = Math.floor(source.y / Config.BLOCK_SIZE) * Config.BLOCK_SIZE;
       const right = source.x < destination.x;
@@ -157,39 +142,33 @@ export default class Ghost implements Entity {
       } else {
         ghost.pathIndex += 1;
         if (ghost.respawning === 1 && !ghost.path[ghost.pathIndex]) {
-          this.state.ghostState.respawn(ghost);
+          this.state.ghostState.respawn(idx);
         }
       }
     });
   }
-  getNeighboringCoordinates(gX, gY) {
-    let c = [
+  getNeighboringCoordinates(gX, gY, visitedNodes: Set<string>) {
+    return [
       { x: gX - Config.BLOCK_SIZE, y: gY }, // Left
       { x: gX + Config.BLOCK_SIZE, y: gY }, // Right
       { x: gX, y: gY - Config.BLOCK_SIZE }, // Top
       { x: gX, y: gY + Config.BLOCK_SIZE }, // Bottom
-    ];
-    c = c.filter(({ x, y }) => {
+    ].filter(({ x, y }) => {
       return (
-        x <= Config.CANVAS_SIZE - Config.BLOCK_SIZE &&
-        y <= Config.CANVAS_SIZE - Config.BLOCK_SIZE &&
+        x <= Config.CANVAS_SIZE.width - Config.BLOCK_SIZE &&
+        y <= Config.CANVAS_SIZE.height - Config.BLOCK_SIZE &&
         x >= 0 &&
-        y >= 0
+        y >= 0 &&
+        !visitedNodes.has(`${x},${y}`) &&
+        !this.state.groundState.wallsMap.has(`${x},${y}`)
       );
     });
-    return c;
   }
   destroy(): void {}
   draw(): void {
     this.state.ghostState.ghosts.forEach((ghost) => {
       this.ctx.drawImage(
-        Config.getAsset(
-          ghost.respawning
-            ? "dead_pacman"
-            : !ghost.panicMode?.flag
-            ? ghost.name
-            : "ghostDead"
-        ),
+        ghost.identity,
         ghost.position.x,
         ghost.position.y,
         Config.BLOCK_SIZE,

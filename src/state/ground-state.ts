@@ -10,7 +10,7 @@ export class GroundState {
   public scoreMap: Set<string> = new Set();
 
   public initializeDefaults() {
-    const bounds = Math.floor(Config.CANVAS_SIZE / Config.BLOCK_SIZE);
+    const bounds = Math.floor(Config.CANVAS_SIZE.width / Config.BLOCK_SIZE);
     for (let i = 0; i < bounds; i++) {
       for (let j = 0; j < bounds; j++) {
         if (i === i && i === 0) continue;

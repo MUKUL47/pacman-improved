@@ -1,8 +1,8 @@
 type Pacman = "PACMAN_LEFT" | "PACMAN_RIGHT" | "PACMAN_UP" | "PACMAN_DOWN";
 type Assets = Pacman;
 export default class Config {
-  private static _CANVAS_SIZE;
-  public static readonly BLOCK_SIZE = 50;
+  private static _CANVAS_SIZE: { width: number; height: number };
+  public static readonly BLOCK_SIZE = 25;
   private static assets: Map<string, HTMLImageElement> = new Map();
   private readonly fileAssets = [
     "../oldpacman/PACMAN/assets/pacman_up.jpg",
@@ -22,7 +22,11 @@ export default class Config {
     "../oldpacman/PACMAN/assets/walkable.png",
   ];
   constructor() {
-    Config._CANVAS_SIZE = document.querySelector("canvas").width;
+    const canvas = document.querySelector("canvas");
+    Config._CANVAS_SIZE = {
+      width: canvas.width,
+      height: canvas.height,
+    };
   }
 
   public static getAsset(name: string): HTMLImageElement {
