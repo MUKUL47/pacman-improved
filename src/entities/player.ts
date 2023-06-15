@@ -158,7 +158,7 @@ export default class Player implements Entity {
 
   draw() {
     this.ctx.drawImage(
-      Config.getAsset(`pacman_${this.direction}`),
+      Config.getAsset(`pacman-${this.direction}`),
       this.playerState.getCoordinates.x,
       this.playerState.getCoordinates.y,
       Config.BLOCK_SIZE,

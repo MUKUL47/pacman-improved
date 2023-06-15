@@ -1,25 +1,46 @@
-type Pacman = "PACMAN_LEFT" | "PACMAN_RIGHT" | "PACMAN_UP" | "PACMAN_DOWN";
-type Assets = Pacman;
+export type AssetType =
+  | "pacman-up"
+  | "pacman-left"
+  | "pacman-down"
+  | "pacman-right"
+  | "dot"
+  | "cherry"
+  | "extra-left"
+  | "wall"
+  | "ghost-panic-left"
+  | "ghost-panic-right"
+  | "ghost-dead"
+  | "ghost-red-left"
+  | "ghost-yellow-left"
+  | "ghost3"
+  | "ghost4"
+  | "extra-life"
+  | "walkable";
 export default class Config {
   private static _CANVAS_SIZE: { width: number; height: number };
-  public static readonly BLOCK_SIZE = 25;
+  public static readonly BLOCK_SIZE = 20;
   private static assets: Map<string, HTMLImageElement> = new Map();
-  private readonly fileAssets = [
-    "../oldpacman/PACMAN/assets/pacman_up.jpg",
-    "../oldpacman/PACMAN/assets/pacman_left.jpg",
-    "../oldpacman/PACMAN/assets/pacman_down.jpg",
-    "../oldpacman/PACMAN/assets/pacman_right.jpg",
-    "../oldpacman/PACMAN/assets/wall1.png",
-    "../oldpacman/PACMAN/assets/walkable.png",
-    "../oldpacman/PACMAN/assets/pacman_food.png",
-    "../oldpacman/PACMAN/assets/pacman_energy.webp",
-    "../oldpacman/PACMAN/assets/redEnemyy.jpg",
-    "../oldpacman/PACMAN/assets/blueEnemy.jpg",
-    "../oldpacman/PACMAN/assets/yellowEnemy.jpg",
-    "../oldpacman/PACMAN/assets/pinkEnemy.jpg",
-    "../oldpacman/PACMAN/assets/ghostDead.jpg",
-    "../oldpacman/PACMAN/assets/dead_pacman.png",
-    "../oldpacman/PACMAN/assets/walkable.png",
+  private readonly fileAssets: `../assets/${AssetType}.${string}`[] = [
+    "../assets/pacman-up.png",
+    "../assets/pacman-left.png",
+    "../assets/pacman-down.png",
+    "../assets/pacman-right.png",
+
+    "../assets/dot.png",
+    "../assets/cherry.png",
+    "../assets/extra-life.png",
+
+    "../assets/wall.png",
+
+    "../assets/ghost-panic-left.png",
+    "../assets/ghost-panic-right.png",
+    "../assets/ghost-dead.jpg",
+
+    "../assets/ghost-red-left.png",
+    "../assets/ghost-yellow-left.png",
+    "../assets/ghost3.png",
+    "../assets/ghost4.png",
+    "../assets/walkable.png",
   ];
   constructor() {
     const canvas = document.querySelector("canvas");
@@ -29,7 +50,7 @@ export default class Config {
     };
   }
 
-  public static getAsset(name: string): HTMLImageElement {
+  public static getAsset(name: AssetType): HTMLImageElement {
     return this.assets.get(name);
   }
 

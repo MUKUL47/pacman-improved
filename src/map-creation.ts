@@ -1,18 +1,18 @@
-import Config from "./config";
+import Config, { AssetType } from "./config";
 import { Asset } from "./types";
 
 export default class MapCreation extends Config {
   private ctx: HTMLCanvasElement;
   private activeAsset: Asset = "wall";
-  private readonly assetMap: Record<Asset, string> = {
-    energy: "pacman_energy",
-    ghost_1: "redEnemyy",
-    ghost_2: "blueEnemy",
-    ghost_3: "yellowEnemy",
-    ghost_4: "pinkEnemy",
-    pacman: "pacman_right",
-    score: "pacman_food",
-    wall: "wall1",
+  private readonly assetMap: Record<Asset, AssetType> = {
+    energy: "cherry",
+    ghost_1: "ghost-red-left",
+    ghost_2: "ghost-yellow-left",
+    ghost_3: "ghost3",
+    ghost_4: "ghost4",
+    pacman: "pacman-right",
+    score: "dot",
+    wall: "wall",
   };
   private xOffset: number = 0;
   private yOffset: number = 0;

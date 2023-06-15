@@ -13,7 +13,7 @@ export class GroundState {
     const bounds = Math.floor(Config.CANVAS_SIZE.width / Config.BLOCK_SIZE);
     for (let i = 0; i < bounds; i++) {
       for (let j = 0; j < bounds; j++) {
-        if (i === i && i === 0) continue;
+        // if (i === i && i === 0) continue;
         const { x, y } = {
           x: i * Config.BLOCK_SIZE,
           y: j * Config.BLOCK_SIZE,

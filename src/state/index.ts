@@ -7,7 +7,7 @@ export class State {
   private _groundState: GroundState;
   private _ghostState: GhostState;
   constructor() {
-    this._playerState = new PlayerState();
+    this._playerState = new PlayerState(2);
     this._groundState = new GroundState();
     this._ghostState = new GhostState();
   }

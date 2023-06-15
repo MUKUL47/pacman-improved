@@ -1,13 +1,13 @@
-import Config from "../../config";
+import Config, { AssetType } from "../../config";
 import { Coordinate } from "../../types";
 
 export default class Ghost {
   public id: string = `${Math.random() * Math.random()}`;
-  public name: string;
+  public name: AssetType;
   public path: Coordinate[] = [];
   public position: Coordinate;
   public pathIndex: number = 0;
-  public speed = Config.getRand({ max: 4, min: 2 });
+  public speed = Config.getRand({ max: 2, min: 3 });
   public difficulty: number = 5;
   public origin: Coordinate;
   public respawning: boolean | 1 = false;
@@ -16,7 +16,7 @@ export default class Ghost {
   private lastScannedTime = -1;
   private searchFrequency: number = 800;
 
-  constructor(name: string, coordinate: Coordinate, difficulty?: number) {
+  constructor(name: AssetType, coordinate: Coordinate, difficulty?: number) {
     this.name = name;
     this.position = coordinate;
     this.origin = coordinate;
@@ -66,10 +66,10 @@ export default class Ghost {
   public get identity() {
     return Config.getAsset(
       this.respawning
-        ? "dead_pacman"
+        ? "ghost-dead"
         : !this.panicMode?.flag
         ? this.name
-        : "ghostDead"
+        : "ghost-panic-left"
     );
   }
 }

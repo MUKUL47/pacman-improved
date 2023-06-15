@@ -3,7 +3,6 @@ import Ghost from "./ghost";
 
 export default class GhostState {
   private _ghosts: Ghost[] = [];
-  public static readonly speed = 7;
   constructor() {}
 
   public get ghosts(): Ghost[] {
@@ -27,16 +26,16 @@ export default class GhostState {
 
   public initializeDefaults(): void {
     this._ghosts = [
-      new Ghost("redEnemyy", { x: 300, y: 0 }).setDifficulty(1),
-      new Ghost("blueEnemy", {
+      new Ghost("ghost-red-left", { x: 300, y: 0 }).setDifficulty(1),
+      new Ghost("ghost-yellow-left", {
         x: Config.CANVAS_SIZE.width - Config.BLOCK_SIZE,
         y: 0,
       }).setDifficulty(2),
-      new Ghost("yellowEnemy", {
+      new Ghost("ghost3", {
         x: 0,
         y: Config.CANVAS_SIZE.height - Config.BLOCK_SIZE,
       }).setDifficulty(3),
-      new Ghost("pinkEnemy", {
+      new Ghost("ghost3", {
         x: Config.CANVAS_SIZE.width - Config.BLOCK_SIZE,
         y: Config.CANVAS_SIZE.height - Config.BLOCK_SIZE,
       }).setDifficulty(4),

@@ -18,8 +18,8 @@ class Game extends Config {
     await this.preloadAssets();
     this.entities = [
       new Ground({ ctx: this.ctx, state: this.state }),
-      // new Player({ ctx: this.ctx, state: this.state }),
-      // new Ghost({ ctx: this.ctx, state: this.state }),
+      new Player({ ctx: this.ctx, state: this.state }),
+      new Ghost({ ctx: this.ctx, state: this.state }),
     ];
     this.renderId = window.requestAnimationFrame(() => this.render());
   };
