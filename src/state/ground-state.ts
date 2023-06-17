@@ -11,9 +11,10 @@ export class GroundState {
 
   public initializeDefaults() {
     const bounds = Math.floor(Config.CANVAS_SIZE.width / Config.BLOCK_SIZE);
+    const center = Math.floor(bounds / 2);
     for (let i = 0; i < bounds; i++) {
       for (let j = 0; j < bounds; j++) {
-        // if (i === i && i === 0) continue;
+        if (i === center && j === i) continue;
         const { x, y } = {
           x: i * Config.BLOCK_SIZE,
           y: j * Config.BLOCK_SIZE,
@@ -24,11 +25,9 @@ export class GroundState {
         } else if (Config.getRand({ max: 50 }) === 50) {
           this._food.push({ x, y });
           this.foodMap.add(`${x},${y}`);
-        } else if (Config.getRand({ max: 5 }) === 5) {
+        } else if (Config.getRand({ max: 2 }) === 2) {
           this._score.push({ x, y });
           this.scoreMap.add(`${x},${y}`);
-        } else {
-          this.walkable.push({ x, y });
         }
       }
     }

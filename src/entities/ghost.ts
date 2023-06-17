@@ -104,10 +104,21 @@ export default class Ghost implements Entity {
     }
   }
   private navigateToPlayer() {
-    this.state.ghostState.ghosts.forEach((ghost, idx) => {
+    const player = this.state.playerState.getCoordinates;
+    for (let idx = 0; idx < this.state.ghostState.ghosts.length; idx++) {
+      const ghost = this.state.ghostState.ghosts[idx];
       const source = ghost.position;
       const destination = ghost.path[ghost.pathIndex];
       if (!destination) return;
+      if (
+        Math.abs(source.x - player.x) <= Math.floor(Config.BLOCK_SIZE / 2) &&
+        Math.abs(source.y - player.y) <= Math.floor(Config.BLOCK_SIZE / 2)
+      ) {
+        if (this.state.playerState.dead()) {
+          this.state.ghostState.initializeDefaults();
+          return;
+        }
+      }
       const x = Math.floor(source.x / Config.BLOCK_SIZE) * Config.BLOCK_SIZE;
       const y = Math.floor(source.y / Config.BLOCK_SIZE) * Config.BLOCK_SIZE;
       const right = source.x < destination.x;
@@ -145,7 +156,7 @@ export default class Ghost implements Entity {
           this.state.ghostState.respawn(idx);
         }
       }
-    });
+    }
   }
   getNeighboringCoordinates(gX, gY, visitedNodes: Set<string>) {
     return [

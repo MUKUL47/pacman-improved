@@ -6,10 +6,18 @@ export class State {
   private _playerState: PlayerState;
   private _groundState: GroundState;
   private _ghostState: GhostState;
-  constructor() {
-    this._playerState = new PlayerState(2);
-    this._groundState = new GroundState();
-    this._ghostState = new GhostState();
+  constructor({
+    player,
+    ground,
+    ghost,
+  }: {
+    player?: PlayerState;
+    ground?: GroundState;
+    ghost?: GhostState;
+  }) {
+    this._playerState = player || new PlayerState({ speed: 2 });
+    this._groundState = ground || new GroundState();
+    this._ghostState = ghost || new GhostState();
   }
   public get playerState(): PlayerState {
     return this._playerState;

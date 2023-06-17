@@ -83,6 +83,12 @@ export default class Player implements Entity {
         Math.abs(y - score.y) <= Math.floor(Config.BLOCK_SIZE / 2)
       ) {
         this.state.groundState.addScore(i);
+        const score = +Config.window["pacman-score"].innerText + 1;
+        Config.window["pacman-score"].innerText = score.toString();
+        if (score === this.state.groundState.score.length) {
+          alert("You won!!!");
+          window.location.reload();
+        }
       }
     }
   }

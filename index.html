@@ -5,9 +5,44 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
+  <style>
+    .game-board {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+    .game-board canvas {
+      height: 500px;
+      width: 500px;
+      border: 1px solid #8885;
+    }
+    h1 {
+      padding: 0;
+      margin: 0;
+    }
+    h1,
+    h1 + div {
+      text-align: center;
+    }
+    a {
+      text-decoration: none;
+      color: #fff;
+    }
+  </style>
   <body>
-    <a role="create" href="/creation-center.html">Creation Center</a>
-    <canvas width="500" height="500"></canvas>
+    <h1>Pacman</h1>
+    <div>
+      <button onclick="restart()">Restart</button>
+      <button onclick="pause()" id="toggle-pause">Pause</button>
+      <button><a href="/creation-center.html">Create Custom Map</a></button>
+    </div>
+    <div class="game-board">
+      <div>
+        <p>Score: <span id="pacman-score">0</span></p>
+        <p>Lives: <span id="pacman-lives"></span></p>
+      </div>
+      <canvas width="500" height="500"></canvas>
+    </div>
     <script type="module" src="/src/index.ts"></script>
   </body>
 </html>

@@ -7,18 +7,22 @@ export type AssetType =
   | "cherry"
   | "extra-left"
   | "wall"
-  | "ghost-panic-left"
-  | "ghost-panic-right"
+  | "ghost-panic"
   | "ghost-dead"
-  | "ghost-red-left"
-  | "ghost-yellow-left"
-  | "ghost3"
-  | "ghost4"
+  | "ghost-red"
+  | "ghost-yellow"
+  | "ghost-blue"
+  | "ghost-green"
   | "extra-life"
   | "walkable";
 export default class Config {
+  public static window: Window & {
+    "pacman-score": HTMLSpanElement;
+    "pacman-lives": HTMLSpanElement;
+    restart: (isGameover?: boolean) => void;
+  } = window as any;
   private static _CANVAS_SIZE: { width: number; height: number };
-  public static readonly BLOCK_SIZE = 20;
+  public static readonly BLOCK_SIZE = 50;
   private static assets: Map<string, HTMLImageElement> = new Map();
   private readonly fileAssets: `../assets/${AssetType}.${string}`[] = [
     "../assets/pacman-up.png",
@@ -32,14 +36,13 @@ export default class Config {
 
     "../assets/wall.png",
 
-    "../assets/ghost-panic-left.png",
-    "../assets/ghost-panic-right.png",
+    "../assets/ghost-panic.png",
     "../assets/ghost-dead.jpg",
 
-    "../assets/ghost-red-left.png",
-    "../assets/ghost-yellow-left.png",
-    "../assets/ghost3.png",
-    "../assets/ghost4.png",
+    "../assets/ghost-red.png",
+    "../assets/ghost-yellow.png",
+    "../assets/ghost-blue.png",
+    "../assets/ghost-green.png",
     "../assets/walkable.png",
   ];
   constructor() {

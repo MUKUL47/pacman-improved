@@ -26,16 +26,16 @@ export default class GhostState {
 
   public initializeDefaults(): void {
     this._ghosts = [
-      new Ghost("ghost-red-left", { x: 300, y: 0 }).setDifficulty(1),
-      new Ghost("ghost-yellow-left", {
+      new Ghost("ghost-red", { x: 300, y: 0 }).setDifficulty(1),
+      new Ghost("ghost-yellow", {
         x: Config.CANVAS_SIZE.width - Config.BLOCK_SIZE,
         y: 0,
       }).setDifficulty(2),
-      new Ghost("ghost3", {
+      new Ghost("ghost-green", {
         x: 0,
         y: Config.CANVAS_SIZE.height - Config.BLOCK_SIZE,
       }).setDifficulty(3),
-      new Ghost("ghost3", {
+      new Ghost("ghost-blue", {
         x: Config.CANVAS_SIZE.width - Config.BLOCK_SIZE,
         y: Config.CANVAS_SIZE.height - Config.BLOCK_SIZE,
       }).setDifficulty(4),

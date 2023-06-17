@@ -7,7 +7,7 @@ export default class Ghost {
   public path: Coordinate[] = [];
   public position: Coordinate;
   public pathIndex: number = 0;
-  public speed = Config.getRand({ max: 2, min: 3 });
+  public speed = 2; //Config.getRand({ max: 2, min: 2 });
   public difficulty: number = 5;
   public origin: Coordinate;
   public respawning: boolean | 1 = false;
@@ -69,7 +69,7 @@ export default class Ghost {
         ? "ghost-dead"
         : !this.panicMode?.flag
         ? this.name
-        : "ghost-panic-left"
+        : "ghost-panic"
     );
   }
 }

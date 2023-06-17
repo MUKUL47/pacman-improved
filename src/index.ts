@@ -1,18 +1,18 @@
 import Config from "./config";
-import { Ground, Player, Ghost } from "./entities";
-import MapCreation from "./map-creation";
-import { State } from "./state";
-import { Entity } from "./types";
+import { Ghost, Ground, Player } from "./entities";
+import { PlayerState, State } from "./state";
 import "./style.css";
+import { Entity } from "./types";
 class Game extends Config {
   private ctx: CanvasRenderingContext2D;
   private entities: Entity[] = [];
   private renderId: number;
-  private state: State;
-  constructor() {
+  public state: State;
+  private paused = false;
+  constructor(state?: State) {
     super();
     this.ctx = document.querySelector("canvas").getContext("2d");
-    this.state = new State();
+    this.state = state || new State({});
   }
   public start = async () => {
     await this.preloadAssets();
@@ -24,6 +24,7 @@ class Game extends Config {
     this.renderId = window.requestAnimationFrame(() => this.render());
   };
   private render() {
+    if (this.paused) return;
     this.ctx.clearRect(
       0,
       0,
@@ -41,5 +42,29 @@ class Game extends Config {
       e.destroy?.();
     }
   }
+  public togglePause() {
+    this.paused = !this.paused;
+    if (!this.paused) this.render();
+  }
 }
-new Game().start();
+let _window: any = window;
+let instance = new Game();
+instance.start();
+_window.restart = (isGameover?: boolean) => {
+  instance.destroy();
+  instance = new Game(
+    isGameover
+      ? new State({
+          player: new PlayerState({
+            lives: instance.state.playerState.lives - 1,
+          }),
+        })
+      : null
+  );
+  instance.start();
+};
+_window.pause = () => {
+  instance.togglePause();
+  const wasPaused = _window["toggle-pause"].innerHTML === "Pause";
+  _window["toggle-pause"].innerHTML = wasPaused ? "Resume" : "Pause";
+};
