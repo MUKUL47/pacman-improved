@@ -1,6 +1,6 @@
-import Config, { AssetType } from "../config";
+import Config from "../config";
 import { GroundState, State } from "../state";
-import { Coordinate, Entity, EntityInstance } from "../types";
+import { AssetType, Coordinate, Entity, EntityInstance } from "../types";
 
 export class Ground implements Entity {
   ctx: CanvasRenderingContext2D;

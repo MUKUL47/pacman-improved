@@ -5,7 +5,7 @@ export default class Player implements Entity {
   ctx: CanvasRenderingContext2D;
   state: State;
   playerState: PlayerState;
-  private direction: Direction = "up";
+  private direction: Direction = "right";
   private readonly directionMap: Record<Direction, number> = {
     down: PlayerState.getSpeed,
     right: PlayerState.getSpeed,

@@ -1,28 +1,14 @@
-export type AssetType =
-  | "pacman-up"
-  | "pacman-left"
-  | "pacman-down"
-  | "pacman-right"
-  | "dot"
-  | "cherry"
-  | "extra-left"
-  | "wall"
-  | "ghost-panic"
-  | "ghost-dead"
-  | "ghost-red"
-  | "ghost-yellow"
-  | "ghost-blue"
-  | "ghost-green"
-  | "extra-life"
-  | "walkable";
+import { AssetType } from "./types";
+
 export default class Config {
   public static window: Window & {
     "pacman-score": HTMLSpanElement;
     "pacman-lives": HTMLSpanElement;
     restart: (isGameover?: boolean) => void;
+    pause: () => void;
   } = window as any;
   private static _CANVAS_SIZE: { width: number; height: number };
-  public static readonly BLOCK_SIZE = 50;
+  private static _BLOCK_SIZE = 25;
   private static assets: Map<string, HTMLImageElement> = new Map();
   private readonly fileAssets: `../assets/${AssetType}.${string}`[] = [
     "../assets/pacman-up.png",
@@ -51,6 +37,14 @@ export default class Config {
       width: canvas.width,
       height: canvas.height,
     };
+  }
+
+  public static get BLOCK_SIZE() {
+    return this._BLOCK_SIZE;
+  }
+
+  public static setBlockSize(size: number): void {
+    this._BLOCK_SIZE = size;
   }
 
   public static getAsset(name: AssetType): HTMLImageElement {

@@ -5,9 +5,20 @@ export class PlayerState {
   private static speed = 1.7;
   public static readonly collisionGap = 1;
   public lives: number;
-  constructor({ speed, lives }: { speed?: number; lives?: number }) {
+  constructor({
+    speed,
+    lives,
+    coordinates,
+  }: {
+    speed?: number;
+    lives?: number;
+    coordinates?: Coordinate;
+  }) {
+    this.coordinates = coordinates ?? this.coordinates;
     this.lives = lives || 3;
-    Config.window["pacman-lives"].innerText = this.lives.toString();
+    if (Config.window["pacman-lives"]) {
+      Config.window["pacman-lives"].innerText = this.lives.toString();
+    }
     if (speed > Config.BLOCK_SIZE)
       throw new Error("Speed cannot be greator than block size");
     PlayerState.speed = speed || 1.5;
@@ -37,11 +48,13 @@ export class PlayerState {
   public static get getSpeed() {
     return this.speed;
   }
-  public dead() {
+  public dead(): "gameover" | "dead" {
     if (--this.lives <= 0) {
-      window.location.reload();
+      return "gameover";
     }
-    Config.window["pacman-lives"].innerText = this.lives.toString();
-    return true;
+    if (Config.window["pacman-lives"]) {
+      Config.window["pacman-lives"].innerText = this.lives.toString();
+    }
+    return "dead";
   }
 }

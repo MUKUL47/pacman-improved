@@ -6,6 +6,7 @@ export class State {
   private _playerState: PlayerState;
   private _groundState: GroundState;
   private _ghostState: GhostState;
+  private gameoverInvokers: Array<() => any> = [];
   constructor({
     player,
     ground,
@@ -27,6 +28,12 @@ export class State {
   }
   public get ghostState(): GhostState {
     return this._ghostState;
+  }
+  public registerGameover(cb: () => any) {
+    this.gameoverInvokers.push(cb);
+  }
+  public gameover() {
+    this.gameoverInvokers.map((fn) => fn.apply?.(null));
   }
 }
 export { PlayerState, GroundState, GhostState };

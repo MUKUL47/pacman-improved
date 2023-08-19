@@ -1,5 +1,5 @@
-import Config, { AssetType } from "../../config";
-import { Coordinate } from "../../types";
+import Config from "../../config";
+import { AssetType, Coordinate } from "../../types";
 
 export default class Ghost {
   public id: string = `${Math.random() * Math.random()}`;
