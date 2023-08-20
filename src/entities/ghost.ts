@@ -29,8 +29,6 @@ export default class Ghost implements Entity {
         ghost.respawning = 1;
       }
 
-      const isLucky =
-        Config.getRand({ min: 1, max: ghost.difficulty }) === ghost.difficulty;
       const destination = ghost.respawning
         ? ghost.origin
         : ghost.panicMode?.flag

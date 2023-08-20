@@ -1,13 +1,6 @@
-import { Game } from ".";
 import Config from "./config";
-import { GhostState, GroundState, PlayerState, State } from "./state";
-import {
-  AssetType,
-  Coordinate,
-  MapCreationAsset,
-  STORAGE,
-  SaveConfig,
-} from "./types";
+import { Game } from "./game";
+import { AssetType, MapCreationAsset, STORAGE, SaveConfig } from "./types";
 import { Util } from "./utils";
 
 export default class MapCreation extends Config {
