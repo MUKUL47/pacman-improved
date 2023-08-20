@@ -1,81 +1,49 @@
 import Config from "./config";
-import { Ghost, Ground, Player } from "./entities";
+import { Game } from "./game";
 import { PlayerState, State } from "./state";
 import "./style.css";
-import { Entity } from "./types";
-type GameProps = {
-  state?: State;
-  onGameover?: () => any;
-};
-export class Game extends Config {
-  private ctx: CanvasRenderingContext2D;
-  private entities: Entity[] = [];
-  private renderId: number;
-  public state: State;
-  private paused = false;
-  private gameover = false;
-  private onGameOver?: () => {};
-  constructor(gameProps?: GameProps) {
-    super();
-    this.ctx = document.querySelector("canvas").getContext("2d");
-    this.state = gameProps?.state || new State({});
-    this.onGameOver = gameProps?.onGameover;
-  }
-  public start = async () => {
-    await this.preloadAssets();
-    this.entities = [
-      new Ground({ ctx: this.ctx, state: this.state }),
-      new Player({ ctx: this.ctx, state: this.state }),
-      new Ghost({ ctx: this.ctx, state: this.state }),
-    ];
-    this.renderId = window.requestAnimationFrame(() => this.render());
-    this.state.registerGameover(() => {
-      this.onGameOver?.apply(null);
-      this.destroy();
-      this.ctx.font = "50px Sans-serif";
-      this.ctx.fillStyle = "white";
-      this.ctx.fillText(
-        "Game Over !!!",
-        Math.floor(Config.CANVAS_SIZE.width / 2) - 150,
-        Config.CANVAS_SIZE.height / 2
-      );
-    });
-  };
-  private clearRect() {
-    this.ctx.clearRect(
-      0,
-      0,
-      Config.CANVAS_SIZE.width,
-      Config.CANVAS_SIZE.height
-    );
-  }
-  private render() {
-    if (this.paused || this.gameover) return;
-    this.clearRect();
-    for (const e of this.entities) {
-      e.draw?.();
-    }
-    this.renderId = window.requestAnimationFrame(() => this.render());
-  }
-  public destroy() {
-    this.gameover = true;
-    window.cancelAnimationFrame(this.renderId);
-    for (const e of this.entities) {
-      e.destroy?.();
-    }
-  }
-  public togglePause() {
-    this.paused = !this.paused;
-    if (!this.paused) this.render();
-  }
-}
+import { MapCreationAsset, STORAGE } from "./types";
+import { Util } from "./utils";
 
 document.addEventListener("DOMContentLoaded", () => {
-  if (window.location.search?.startsWith("?creation")) return;
-  let _window = Config.window;
-  let instance = new Game();
-  instance.start();
-  _window.restart = (isGameover?: boolean) => {
+  const search = window.location.search;
+  if (search?.startsWith("?creation")) return;
+  if (search?.startsWith("?custom-game")) {
+    loadCustomGame();
+    return;
+  }
+  loadStandardGame();
+});
+
+function loadCustomGame() {
+  try {
+    const renderblocks = new Map(
+      JSON.parse(sessionStorage.getItem(STORAGE.GAME_INSTANCE))
+    ) as Map<string, MapCreationAsset>;
+    const instance = Util.customGameInstance(
+      renderblocks,
+      () => {
+        window.location.reload();
+      },
+      3
+    );
+    pauseControl(instance);
+    restartControl(instance);
+    instance.start();
+  } catch (e) {
+    alert("Failed to load custom game");
+    loadStandardGame();
+  }
+}
+function pauseControl(instance: Game) {
+  Config.window.pause = () => {
+    instance.togglePause();
+    const wasPaused = Config.window["toggle-pause"].innerHTML === "Pause";
+    Config.window["toggle-pause"].innerHTML = wasPaused ? "Resume" : "Pause";
+  };
+}
+function restartControl(instance: Game) {
+  Config.window.restart = (isGameover?: boolean) => {
     instance.destroy();
     instance = new Game({
       state: isGameover
@@ -84,13 +52,14 @@ document.addEventListener("DOMContentLoaded", () => {
               lives: instance.state.playerState.lives - 1,
             }),
           })
-        : null,
+        : instance.state || null,
     });
     instance.start();
   };
-  _window.pause = () => {
-    instance.togglePause();
-    const wasPaused = _window["toggle-pause"].innerHTML === "Pause";
-    _window["toggle-pause"].innerHTML = wasPaused ? "Resume" : "Pause";
-  };
-});
+}
+function loadStandardGame() {
+  let instance = new Game();
+  instance.start();
+  restartControl(instance);
+  pauseControl(instance);
+}

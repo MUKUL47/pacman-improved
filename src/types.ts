@@ -49,3 +49,11 @@ export type GroundStateProps = {
   score?: Set<string>;
   pacman?: Coordinate;
 };
+
+export const enum STORAGE {
+  GAME_INSTANCE = "GAME_INSTANCE",
+}
+export type GameProps = {
+  state?: State;
+  onGameover?: () => any;
+};

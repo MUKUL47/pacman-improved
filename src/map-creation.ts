@@ -1,7 +1,14 @@
 import { Game } from ".";
 import Config from "./config";
 import { GhostState, GroundState, PlayerState, State } from "./state";
-import { AssetType, Coordinate, MapCreationAsset, SaveConfig } from "./types";
+import {
+  AssetType,
+  Coordinate,
+  MapCreationAsset,
+  STORAGE,
+  SaveConfig,
+} from "./types";
+import { Util } from "./utils";
 
 export default class MapCreation extends Config {
   private ctx: HTMLCanvasElement;
@@ -28,7 +35,6 @@ export default class MapCreation extends Config {
   constructor() {
     super();
     this.initializeRender();
-    this.listenToConfigUpload();
   }
 
   private initializeRender() {
@@ -70,6 +76,10 @@ export default class MapCreation extends Config {
       this.tiggerCreateMode();
     } else if (btn.role === "save_config") {
       this.saveConfig();
+    } else if (btn.role === "load_and_play") {
+      this.uploadAndPlay();
+    } else if (btn.role === "load_config") {
+      this.listenToConfigUpload();
     }
   };
 
@@ -82,54 +92,8 @@ export default class MapCreation extends Config {
   private playTestMode() {
     if (!this.isPacmanSet) return alert("Pacman missing!!!");
     this.isTestmode = true;
-    let pacman = {};
-    const assets: Partial<Record<MapCreationAsset, Set<string>>> = {
-      score: new Set<string>(),
-      wall: new Set<string>(),
-      energy: new Set<string>(),
-    };
-    const ghostsAssets: Partial<Record<MapCreationAsset, Coordinate[]>> = {
-      "ghost-red": [],
-      "ghost-blue": [],
-      "ghost-green": [],
-      "ghost-yellow": [],
-    };
-    for (let [coord, asset] of this.renderBlocks.entries()) {
-      const [x, y] = coord.split(",").map(Number);
-      if (asset === "pacman") {
-        pacman = { x, y };
-      } else if (["score", "wall", "energy"].includes(asset)) {
-        assets[asset].add(`${x},${y}`);
-      } else if (
-        ["ghost-red", "ghost-blue", "ghost-green", "ghost-yellow"].includes(
-          asset
-        )
-      ) {
-        ghostsAssets[asset].push({ x, y });
-      }
-    }
-    this.gameInstance = new Game({
-      state: new State({
-        ghost: new GhostState({
-          "ghost-blue": ghostsAssets["ghost-blue"],
-          "ghost-red": ghostsAssets["ghost-red"],
-          "ghost-yellow": ghostsAssets["ghost-yellow"],
-          "ghost-green": ghostsAssets["ghost-green"],
-        }),
-        player: new PlayerState({
-          coordinates: pacman as Coordinate,
-          lives: 0,
-        }),
-        ground: new GroundState({
-          food: assets.energy,
-          pacman: pacman as Coordinate,
-          score: assets.score,
-          walls: assets.wall,
-        }),
-      }),
-      onGameover: () => {
-        this.tiggerCreateMode();
-      },
+    this.gameInstance = Util.customGameInstance(this.renderBlocks, () => {
+      this.tiggerCreateMode();
     });
     this.gameInstance.start();
   }
@@ -232,11 +196,32 @@ export default class MapCreation extends Config {
     }
   }
 
+  private uploadAndPlay() {
+    const fileInput: HTMLInputElement = document.createElement("input");
+    fileInput.type = "file";
+    fileInput?.addEventListener("change", async (e: Event) => {
+      try {
+        const target = e.target as HTMLInputElement;
+        if (target.files) {
+          const saveConfig = await Util.decodeConfig(target.files as any);
+          sessionStorage.setItem(
+            STORAGE.GAME_INSTANCE,
+            JSON.stringify(saveConfig.assets)
+          );
+          window.location.href = "/index.html?custom-game";
+        }
+      } catch (ee) {
+        fileInput.value = "";
+        alert("Failed to read the config");
+      }
+    });
+    fileInput.click();
+  }
+
   private listenToConfigUpload() {
-    const inpElement = document.querySelector(
-      'input[role="load_config"]'
-    ) as HTMLInputElement;
-    inpElement?.addEventListener("change", async (e: Event) => {
+    const fileInput: HTMLInputElement = document.createElement("input");
+    fileInput.type = "file";
+    fileInput?.addEventListener("change", async (e: Event) => {
       try {
         const target = e.target as HTMLInputElement;
         if (target.files) {
@@ -246,13 +231,14 @@ export default class MapCreation extends Config {
           this.renderBlocks = new Map(encodedResponse.assets);
           this.isPacmanSet = encodedResponse.isPacman;
           this.render();
-          inpElement.value = "";
+          fileInput.value = "";
         }
       } catch (ee) {
-        inpElement.value = "";
+        fileInput.value = "";
         alert("Failed to read the config");
       }
     });
+    fileInput.click();
   }
 
   destroy() {

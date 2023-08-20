@@ -33,7 +33,7 @@ export default class Ghost implements Entity {
         Config.getRand({ min: 1, max: ghost.difficulty }) === ghost.difficulty;
       const destination = ghost.respawning
         ? ghost.origin
-        : ghost.panicMode?.flag || !isLucky
+        : ghost.panicMode?.flag
         ? this.getRandSaveSpot()
         : this.state.playerState.getCoordinates;
       const [pX, pY] = [

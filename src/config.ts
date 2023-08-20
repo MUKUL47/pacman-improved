@@ -31,12 +31,16 @@ export default class Config {
     "../assets/ghost-green.png",
     "../assets/walkable.png",
   ];
-  constructor() {
+
+  public static initConfig() {
     const canvas = document.querySelector("canvas");
     Config._CANVAS_SIZE = {
       width: canvas.width,
       height: canvas.height,
     };
+  }
+  constructor() {
+    Config.initConfig();
   }
 
   public static get BLOCK_SIZE() {
