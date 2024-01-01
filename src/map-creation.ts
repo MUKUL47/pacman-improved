@@ -41,8 +41,8 @@ export default class MapCreation extends Config {
     this.blockSize = MapCreation.updateConfig();
     Config.setBlockSize(this.blockSize);
     window["block_size"].value = this.blockSize;
-    ["change", "keyup"].forEach((k) =>
-      this.blockSizeDom.addEventListener("change", (e) => {
+    ["change", "keyup"].forEach((k: string) =>
+      this.blockSizeDom.addEventListener(k, (e) => {
         const v = +e.target.value;
         if (isNaN(v) || v < 10 || v > 30) return;
         localStorage.setItem("config_size", `${v}`);

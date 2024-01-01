@@ -1,4 +1,3 @@
-import MapCreation from "./map-creation";
 import { AssetType } from "./types";
 
 export default class Config {
@@ -11,26 +10,26 @@ export default class Config {
   private static _CANVAS_SIZE: { width: number; height: number };
   private static _BLOCK_SIZE = 25;
   private static assets: Map<string, HTMLImageElement> = new Map();
-  private readonly fileAssets: `../assets/${AssetType}.${string}`[] = [
-    "../assets/pacman-up.png",
-    "../assets/pacman-left.png",
-    "../assets/pacman-down.png",
-    "../assets/pacman-right.png",
+  private readonly fileAssets: `./assets/${AssetType}.${string}`[] = [
+    "./assets/pacman-up.png",
+    "./assets/pacman-left.png",
+    "./assets/pacman-down.png",
+    "./assets/pacman-right.png",
 
-    "../assets/dot.png",
-    "../assets/cherry.png",
-    "../assets/extra-life.png",
+    "./assets/dot.png",
+    "./assets/cherry.png",
+    "./assets/extra-life.png",
 
-    "../assets/wall.png",
+    "./assets/wall.png",
 
-    "../assets/ghost-panic.png",
-    "../assets/ghost-dead.jpg",
+    "./assets/ghost-panic.png",
+    "./assets/ghost-dead.jpg",
 
-    "../assets/ghost-red.png",
-    "../assets/ghost-yellow.png",
-    "../assets/ghost-blue.png",
-    "../assets/ghost-green.png",
-    "../assets/walkable.png",
+    "./assets/ghost-red.png",
+    "./assets/ghost-yellow.png",
+    "./assets/ghost-blue.png",
+    "./assets/ghost-green.png",
+    "./assets/walkable.png",
   ];
   public static initConfig() {
     const canvas = document.querySelector("canvas");
