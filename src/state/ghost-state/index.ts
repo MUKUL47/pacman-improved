@@ -9,6 +9,12 @@ export default class GhostState {
     "ghost-yellow": 2,
     "ghost-green": 3,
     "ghost-blue": 4,
+  } as const;
+  static readonly ghostColorMap = {
+    1: "red",
+    2: "yellow",
+    3: "green",
+    4: "blue",
   };
   private initialized?: GhostStateProps;
   constructor(ghosts?: GhostStateProps) {

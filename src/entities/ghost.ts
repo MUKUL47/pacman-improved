@@ -1,5 +1,6 @@
 import Config from "../config";
-import { State } from "../state";
+import { BFS } from "../path-finder";
+import { GhostState, State } from "../state";
 import { Coordinate, Direction, Entity, EntityInstance } from "../types";
 
 export default class Ghost implements Entity {
@@ -42,46 +43,17 @@ export default class Ghost implements Entity {
         Math.floor(ghost.position.x / Config.BLOCK_SIZE) * Config.BLOCK_SIZE,
         Math.floor(ghost.position.y / Config.BLOCK_SIZE) * Config.BLOCK_SIZE,
       ];
-      let coordinatesPath: Coordinate[] = [
-        {
-          x: gX,
-          y: gY,
-        },
-      ];
-      const visitedNodes = new Set<string>([`${gX},${gY}`]);
-      while (coordinatesPath.length > 0) {
-        const { x, y } = coordinatesPath[coordinatesPath.length - 1];
-        const neighbors = this.getNeighboringCoordinates(x, y, visitedNodes);
-        if (neighbors.length === 0) {
-          //backtrack
-          coordinatesPath.pop();
-          continue;
-        }
-        const [_, __, nearestNode] = neighbors.reduce<
-          [number, number, { x: number; y: number } | null]
-        >(
-          ([x1, y1, oldNode], c) => {
-            const dX = Math.abs(c.x - pX);
-            const dY = Math.abs(c.y - pY);
-            const isNearest = dX <= x1 && dY <= y1;
-            const node = isNearest ? { x: c.x, y: c.y } : oldNode;
-            return [
-              isNearest ? dX : x1,
-              isNearest ? dY : y1,
-              isNearest ? node : oldNode,
-            ];
-          },
-          [Number.MAX_SAFE_INTEGER, Number.MAX_SAFE_INTEGER, null]
-        );
-        if (!nearestNode) break; //path doesnt exist
-        coordinatesPath.push(nearestNode);
-        if (nearestNode.x === pX && nearestNode.y === pY) {
-          //path found
-          break;
-        }
-        visitedNodes.add(`${nearestNode.x},${nearestNode.y}`);
+      const origin = { x: gX, y: gY };
+      const isHit =
+        Config.getRand({ min: 1, max: ghost.difficulty * 1.2 }) === 1;
+      const destinationTarget = isHit
+        ? { x: pX, y: pY }
+        : this.getRandSaveSpot();
+      let path = BFS.find(this.state, origin, destinationTarget);
+      if (isHit && path.length === 0) {
+        path = BFS.find(this.state, origin, this.getRandSaveSpot());
       }
-      ghost.setPath(coordinatesPath);
+      ghost.setPath(path);
     });
   }
   private getRandSaveSpot(): Coordinate {
@@ -159,25 +131,22 @@ export default class Ghost implements Entity {
       }
     }
   }
-  getNeighboringCoordinates(gX, gY, visitedNodes: Set<string>) {
-    return [
-      { x: gX - Config.BLOCK_SIZE, y: gY }, // Left
-      { x: gX + Config.BLOCK_SIZE, y: gY }, // Right
-      { x: gX, y: gY - Config.BLOCK_SIZE }, // Top
-      { x: gX, y: gY + Config.BLOCK_SIZE }, // Bottom
-    ].filter(({ x, y }) => {
-      return (
-        x <= Config.CANVAS_SIZE.width - Config.BLOCK_SIZE &&
-        y <= Config.CANVAS_SIZE.height - Config.BLOCK_SIZE &&
-        x >= 0 &&
-        y >= 0 &&
-        !visitedNodes.has(`${x},${y}`) &&
-        !this.state.groundState.wallsMap.has(`${x},${y}`)
-      );
-    });
-  }
   destroy(): void {}
   draw(): void {
+    this.state.ghostState.ghosts.forEach((ghost) => {
+      ghost.path.slice(ghost.pathIndex).forEach((g) => {
+        this.ctx.beginPath();
+        this.ctx.arc(
+          g.x + Config.BLOCK_SIZE / 2,
+          g.y + Config.BLOCK_SIZE / 2,
+          2,
+          0,
+          2 * Math.PI
+        );
+        this.ctx.fillStyle = GhostState.ghostColorMap[ghost.difficulty];
+        this.ctx.fill();
+      });
+    });
     this.state.ghostState.ghosts.forEach((ghost) => {
       this.ctx.drawImage(
         ghost.identity,

@@ -7,14 +7,14 @@ export default class Ghost {
   public path: Coordinate[] = [];
   public position: Coordinate;
   public pathIndex: number = 0;
-  public speed = 2; //Config.getRand({ max: 2, min: 2 });
+  public speed = 1; //Config.getRand({ max: 2, min: 2 });
   public difficulty: number = 5;
   public origin: Coordinate;
   public respawning: boolean | 1 = false;
   public panicModeFrequency = 5000;
   public panicMode: { flag: boolean; lastPanicedAt?: number };
   private lastScannedTime = -1;
-  private searchFrequency: number = 800;
+  private searchFrequency: number = 1000;
 
   constructor(name: AssetType, coordinate: Coordinate, difficulty?: number) {
     this.name = name;
@@ -37,6 +37,7 @@ export default class Ghost {
   }
   public setDifficulty(n: number): this {
     this.difficulty = n;
+    this.searchFrequency = this.searchFrequency * n * 2;
     return this;
   }
 
@@ -56,7 +57,10 @@ export default class Ghost {
   }
   public get isTimeToSearch(): boolean {
     const now = Date.now();
-    if (now - this.lastScannedTime >= this.searchFrequency) {
+    if (
+      now - this.lastScannedTime >= this.searchFrequency ||
+      this.pathIndex === this.path.length
+    ) {
       this.lastScannedTime = now;
       return true;
     }
