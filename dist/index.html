@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script type="module" crossorigin src="/assets/main-b23b46c6.js"></script>
+    <link rel="stylesheet" href="/assets/index-03ee5306.css">
+  </head>
+  <style>
+    .game-board {
+      display: flex;
+      justify-content: center;
+      gap: 1rem;
+    }
+    .game-board canvas {
+      height: 500px;
+      width: 500px;
+      border: 1px solid #8885;
+    }
+    h1 {
+      padding: 0;
+      margin: 0;
+    }
+    h1,
+    h1 + div {
+      text-align: center;
+    }
+    a {
+      text-decoration: none;
+      color: #fff;
+    }
+  </style>
+  <body>
+    <h1>Pacman</h1>
+    <div>
+      <button onclick="restart()">Restart</button>
+      <button onclick="pause()" id="toggle-pause">Pause</button>
+      <button>
+        <a href="/creation-center.html?creation">Create Custom Map</a>
+      </button>
+      <button>
+        <a href="/index.html?reset">Reset Map</a>
+      </button>
+      <button onclick="toggleGhostPath()">Ghost Path</button>
+    </div>
+    <div class="game-board">
+      <div>
+        <p>Score: <span id="pacman-score">0</span></p>
+        <p>Lives: <span id="pacman-lives"></span></p>
+      </div>
+      <canvas width="500" height="500"></canvas>
+    </div>
+    
+  </body>
+  <script>
+    function toggleGhostPath() {
+      if (!!localStorage.getItem("ghost-path")) {
+        return localStorage.removeItem("ghost-path");
+      }
+      return localStorage.setItem("ghost-path", "true");
+    }
+  </script>
+</html>
