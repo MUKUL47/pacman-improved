@@ -18,6 +18,31 @@ export default class GhostState {
   };
   private initialized?: GhostStateProps;
   constructor(ghosts?: GhostStateProps) {
+    this._ghosts = new Proxy(this._ghosts, {
+      // Define the 'set' trap to intercept array modifications
+      set: function (target, property, value) {
+        // Check if the property being set is 'length'
+        if (property === "length") {
+          // If it is, perform the default behavior
+          target[property] = value;
+        } else {
+          // Otherwise, log the modification and perform the default behavior
+          console.log(
+            `Property '${property.toString()}' is being set to:`,
+            value
+          );
+          target[property] = value;
+        }
+
+        // If the property is 'length' and the value is greater than 0, trigger a debugger statement
+        if (property === "length" && value > 0) {
+          debugger;
+        }
+
+        // Indicate success
+        return true;
+      },
+    });
     if (ghosts) {
       this.initialized = ghosts;
       this.customGhosts();
@@ -59,6 +84,7 @@ export default class GhostState {
 
   public initializeDefaults(): void {
     if (this.initialized) {
+      this._ghosts = [];
       this.customGhosts();
       return;
     }

@@ -40,6 +40,7 @@
       <button>
         <a href="/index.html?reset">Reset Map</a>
       </button>
+      <button onclick="toggleGhostPath()">Ghost Path</button>
     </div>
     <div class="game-board">
       <div>
@@ -50,4 +51,12 @@
     </div>
     <script type="module" src="/src/index.ts"></script>
   </body>
+  <script>
+    function toggleGhostPath() {
+      if (!!localStorage.getItem("ghost-path")) {
+        return localStorage.removeItem("ghost-path");
+      }
+      return localStorage.setItem("ghost-path", "true");
+    }
+  </script>
 </html>

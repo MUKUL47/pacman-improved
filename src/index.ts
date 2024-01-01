@@ -45,16 +45,18 @@ function pauseControl(instance: Game) {
 function restartControl(instance: Game) {
   Config.window.restart = (isGameover?: boolean) => {
     instance.destroy();
-    instance = new Game({
-      state: isGameover
-        ? new State({
-            player: new PlayerState({
-              lives: instance.state.playerState.lives - 1,
-            }),
-          })
-        : instance.state || null,
-    });
-    instance.start();
+    setTimeout(() => {
+      instance = new Game({
+        state: isGameover
+          ? new State({
+              player: new PlayerState({
+                lives: instance.state.playerState.lives - 1,
+              }),
+            })
+          : null,
+      });
+      instance.start();
+    }, 500);
   };
 }
 function loadStandardGame() {

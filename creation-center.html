@@ -59,10 +59,19 @@
         <button role="save_config">Save</button>
         <button role="load_and_play">Load and play</button>
         <button role="load_config">Upload config</button>
+        <button onclick="toggleGhostPath()">Ghost Path</button>
       </div>
       <canvas width="500" height="500"></canvas>
       <script type="module" src="/src/map-creation.ts"></script>
       <script type="module" src="/src/index.ts"></script>
     </div>
   </body>
+  <script>
+    function toggleGhostPath() {
+      if (!!localStorage.getItem("ghost-path")) {
+        return localStorage.removeItem("ghost-path");
+      }
+      return localStorage.setItem("ghost-path", "true");
+    }
+  </script>
 </html>

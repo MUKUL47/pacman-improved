@@ -133,20 +133,22 @@ export default class Ghost implements Entity {
   }
   destroy(): void {}
   draw(): void {
-    this.state.ghostState.ghosts.forEach((ghost) => {
-      ghost.path.slice(ghost.pathIndex).forEach((g) => {
-        this.ctx.beginPath();
-        this.ctx.arc(
-          g.x + Config.BLOCK_SIZE / 2,
-          g.y + Config.BLOCK_SIZE / 2,
-          2,
-          0,
-          2 * Math.PI
-        );
-        this.ctx.fillStyle = GhostState.ghostColorMap[ghost.difficulty];
-        this.ctx.fill();
+    if (!!localStorage.getItem("ghost-path")) {
+      this.state.ghostState.ghosts.forEach((ghost) => {
+        ghost.path.slice(ghost.pathIndex).forEach((g) => {
+          this.ctx.beginPath();
+          this.ctx.arc(
+            g.x + Config.BLOCK_SIZE / 2,
+            g.y + Config.BLOCK_SIZE / 2,
+            2,
+            0,
+            2 * Math.PI
+          );
+          this.ctx.fillStyle = GhostState.ghostColorMap[ghost.difficulty];
+          this.ctx.fill();
+        });
       });
-    });
+    }
     this.state.ghostState.ghosts.forEach((ghost) => {
       this.ctx.drawImage(
         ghost.identity,
