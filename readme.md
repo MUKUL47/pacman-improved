@@ -11,3 +11,5 @@
 5. This clone follows the same old classic pacman rules i.e 4 ghosts will be following a player in a custom built maze, objective is to collect all berries and make ghosts panic after collecting boosts etc. Although ghost movement is mix between BFS and random path.
 
 # <a href="https://mukul47.github.io/pacman-improved/index.html">Play Now</a>
+
+<img src="https://github.com/MUKUL47/pacman-improved/blob/main/demo.png" />
