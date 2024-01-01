@@ -103,7 +103,7 @@ export default class Player implements Entity {
         !!ghost.panicMode?.flag
       ) {
         ghost.respawning = true;
-        ghost.speed = 10;
+        ghost.speed = 2.5;
       }
     });
   }

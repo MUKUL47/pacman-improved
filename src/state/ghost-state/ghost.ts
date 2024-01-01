@@ -59,7 +59,8 @@ export default class Ghost {
     const now = Date.now();
     if (
       now - this.lastScannedTime >= this.searchFrequency ||
-      this.pathIndex === this.path.length
+      this.pathIndex === this.path.length ||
+      this.respawning
     ) {
       this.lastScannedTime = now;
       return true;

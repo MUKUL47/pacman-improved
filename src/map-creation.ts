@@ -21,7 +21,7 @@ export default class MapCreation extends Config {
   private yOffset: number = 0;
   private renderBlocks = new Map<string, MapCreationAsset>();
   private isCanvasMouseClick: boolean = false;
-  private isDragMode: boolean = false;
+  private isDragMode: boolean = true;
   private isPacmanSet: boolean = false;
   private isTestmode: boolean = false;
   private gameInstance: Game;

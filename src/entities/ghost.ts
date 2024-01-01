@@ -46,9 +46,8 @@ export default class Ghost implements Entity {
       const origin = { x: gX, y: gY };
       const isHit =
         Config.getRand({ min: 1, max: ghost.difficulty * 1.2 }) === 1;
-      const destinationTarget = isHit
-        ? { x: pX, y: pY }
-        : this.getRandSaveSpot();
+      const destinationTarget =
+        isHit || ghost.respawning ? { x: pX, y: pY } : this.getRandSaveSpot();
       let path = BFS.find(this.state, origin, destinationTarget);
       if (isHit && path.length === 0) {
         path = BFS.find(this.state, origin, this.getRandSaveSpot());
@@ -84,12 +83,14 @@ export default class Ghost implements Entity {
         Math.abs(source.x - player.x) <= Math.floor(Config.BLOCK_SIZE / 2) &&
         Math.abs(source.y - player.y) <= Math.floor(Config.BLOCK_SIZE / 2)
       ) {
-        const pState = this.state.playerState.dead() == "dead";
-        if (pState) {
-          this.state.ghostState.initializeDefaults();
-        } else {
-          this.state.gameover();
-          return;
+        if (!ghost.panicMode?.flag && !ghost.respawning) {
+          const pState = this.state.playerState.dead() == "dead";
+          if (pState) {
+            this.state.ghostState.initializeDefaults();
+          } else {
+            this.state.gameover();
+            return;
+          }
         }
       }
       const x = Math.floor(source.x / Config.BLOCK_SIZE) * Config.BLOCK_SIZE;
