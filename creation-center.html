@@ -21,8 +21,6 @@
     button {
       background: cornflowerblue;
       color: #fff;
-      font-size: 1rem;
-      padding: 10px;
       border: none;
       border-radius: 2.5px;
       cursor: pointer;
@@ -60,6 +58,14 @@
         <button role="load_and_play">Load and play</button>
         <button role="load_config">Upload config</button>
         <button onclick="toggleGhostPath()">Ghost Path</button>
+        <input
+          type="number"
+          id="block_size"
+          name="quantity"
+          min="10"
+          placeholder="Block Size"
+          max="30"
+        />
       </div>
       <canvas width="500" height="500"></canvas>
       <script type="module" src="/src/map-creation.ts"></script>

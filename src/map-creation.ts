@@ -25,6 +25,8 @@ export default class MapCreation extends Config {
   private isPacmanSet: boolean = false;
   private isTestmode: boolean = false;
   private gameInstance: Game;
+  private blockSizeDom = window["block_size"];
+  private blockSize = Config.BLOCK_SIZE;
   constructor() {
     super();
     this.initializeRender();
@@ -35,6 +37,24 @@ export default class MapCreation extends Config {
     this.xOffset = this.ctx.offsetLeft;
     this.yOffset = this.ctx.offsetTop;
     this.preloadAssets().then(this.initListener);
+    //
+    this.blockSize = MapCreation.updateConfig();
+    Config.setBlockSize(this.blockSize);
+    window["block_size"].value = this.blockSize;
+    ["change", "keyup"].forEach((k) =>
+      this.blockSizeDom.addEventListener("change", (e) => {
+        const v = +e.target.value;
+        if (isNaN(v) || v < 10 || v > 30) return;
+        localStorage.setItem("config_size", `${v}`);
+        window.location.reload();
+      })
+    );
+  }
+
+  static updateConfig() {
+    const configSize = localStorage.getItem("config_size");
+    const newConfig = configSize ? +configSize : Config.BLOCK_SIZE;
+    return newConfig;
   }
 
   private initListener = () => {
@@ -177,6 +197,7 @@ export default class MapCreation extends Config {
       let encoded = JSON.stringify({
         isPacman: this.isPacmanSet,
         assets: [...this.renderBlocks],
+        config: this.blockSize,
       } as SaveConfig);
       const encodedURI =
         "data:text;charset=utf-8," + encodeURIComponent(encoded);
@@ -201,7 +222,9 @@ export default class MapCreation extends Config {
             STORAGE.GAME_INSTANCE,
             JSON.stringify(saveConfig.assets)
           );
-          window.location.href = "/index.html?custom-game";
+          window.location.href = `/index.html?custom-game&config=${
+            saveConfig.config ?? Config.BLOCK_SIZE
+          }`;
         }
       } catch (ee) {
         fileInput.value = "";
@@ -221,6 +244,14 @@ export default class MapCreation extends Config {
           const encodedResponse = JSON.parse(
             await target.files[0].text()
           ) as SaveConfig;
+          const newConfig = encodedResponse.config
+            ? +encodedResponse.config
+            : Config.BLOCK_SIZE;
+          Config.setBlockSize(
+            encodedResponse.config ? +encodedResponse.config : Config.BLOCK_SIZE
+          );
+          localStorage.setItem("config_size", `${newConfig}`);
+          window["block_size"].value = newConfig;
           this.renderBlocks = new Map(encodedResponse.assets);
           this.isPacmanSet = encodedResponse.isPacman;
           this.render();

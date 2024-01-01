@@ -37,6 +37,7 @@ export type MapCreationAsset =
 export type SaveConfig = {
   isPacman: boolean;
   assets: Array<[string, MapCreationAsset]>;
+  config?: number;
 };
 export type GhostStateProps = Record<
   "ghost-red" | "ghost-blue" | "ghost-green" | "ghost-yellow",

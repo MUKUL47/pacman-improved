@@ -1,3 +1,4 @@
+import MapCreation from "./map-creation";
 import { AssetType } from "./types";
 
 export default class Config {
@@ -31,7 +32,6 @@ export default class Config {
     "../assets/ghost-green.png",
     "../assets/walkable.png",
   ];
-
   public static initConfig() {
     const canvas = document.querySelector("canvas");
     Config._CANVAS_SIZE = {

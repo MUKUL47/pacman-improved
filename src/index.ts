@@ -17,6 +17,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function loadCustomGame() {
   try {
+    const path = window.location.search.replace("?custom-game&", "");
+    if (path.startsWith("config=")) {
+      Config.setBlockSize(+path.split("=")[1]);
+    }
     const renderblocks = new Map(
       JSON.parse(sessionStorage.getItem(STORAGE.GAME_INSTANCE))
     ) as Map<string, MapCreationAsset>;
